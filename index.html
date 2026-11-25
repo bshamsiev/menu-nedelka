@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Что приготовить?</title>
+<meta name="description" content="Меню на неделю для семьи со списком покупок и стоимостью в сумах.">
+<meta name="theme-color" content="#1d6f84">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Меню">
+<style>
+:root{--bg:#f4f7f6;--cd:#fff;--tx:#17242b;--mu:#617078;--ac:#1d6f84;--ac2:#e9a53b;--bd:#d9e2e1;--on:#fff;--hi:#fff6e6;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111b20;--cd:#1a272d;--tx:#e8f0ef;--mu:#93a5aa;--ac:#4fb3c8;--ac2:#f0b550;--bd:#2c3e45;--on:#0c1418;--hi:#2a2a1f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111b20;--cd:#1a272d;--tx:#e8f0ef;--mu:#93a5aa;--ac:#4fb3c8;--ac2:#f0b550;--bd:#2c3e45;--on:#0c1418;--hi:#2a2a1f;color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font:700 30px/1.1 Georgia,"Times New Roman",serif;margin:8px 0 4px}
+h2{font-size:17px;margin:0 0 10px}
+h3{font-size:14px;color:var(--mu);margin:12px 0 2px}
+p.s{color:var(--mu);margin:0 0 18px}
+section{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin:0 0 12px}
+section.today{background:var(--hi);border-color:var(--ac2)}
+label.f{display:block;font-size:14px;color:var(--mu);margin:8px 0 4px}
+input[type=number],input[type=text],select{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1;min-width:140px}
+.chip{display:inline-block;margin:0 6px 6px 0}
+.chip input{position:absolute;opacity:0}
+.chip span{display:inline-block;padding:7px 13px;border:1px solid var(--bd);border-radius:99px;cursor:pointer;background:var(--bg)}
+.chip input:checked+span{background:var(--ac);border-color:var(--ac);color:var(--on)}
+.chip input:focus-visible+span,button:focus-visible,summary:focus-visible{outline:3px solid var(--ac2);outline-offset:2px}
+button{font:inherit;cursor:pointer}
+.go{width:100%;padding:14px;border:0;border-radius:10px;background:var(--ac2);color:#2a1d05;font-weight:700;font-size:17px;margin:4px 0 20px}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 12px}
+.sum div{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.sum b{display:block;font-size:19px;white-space:nowrap}.sum small{color:var(--mu)}
+.ok{color:#2e8b57}.bad{color:#c0462f}
+.day h2{font-family:Georgia,serif;font-size:19px}
+.ml{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--bd)}
+.ml:first-of-type{border-top:0}
+.ml em{font-style:normal;color:var(--mu);font-size:13px;width:62px;flex:none;padding-top:2px}
+.ml>span{flex:1}.ml small{color:var(--mu);display:block}
+.sw{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;padding:6px 10px;min-height:36px}
+.pick{margin:8px 0 0;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)}
+.pick .acts{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+.pick .opt{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--bd);background:none;color:var(--tx);padding:8px 2px}
+.pick .opt small{display:inline;color:var(--mu)}
+.it{display:flex;gap:8px;align-items:flex-start;padding:5px 0}.it>span{flex:1}.it b{font-weight:500;color:var(--mu);text-align:right;white-space:nowrap}
+.it small{display:block;color:var(--mu);font-size:13px}
+.it input:checked+span{text-decoration:line-through;color:var(--mu)}
+details{margin:0 0 12px}summary{cursor:pointer;color:var(--ac);padding:6px 0}
+.pr{display:flex;gap:8px;align-items:center;margin:4px 0}.pr span{flex:1}.pr input{width:120px}
+.msg{padding:14px;border:1px dashed var(--bd);border-radius:10px;color:var(--mu)}
+section>h2{cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0}
+section>h2::after{content:"";width:8px;height:8px;border:solid var(--mu);border-width:0 2px 2px 0;transform:rotate(45deg);margin-right:4px;flex:none}
+section.cl>h2::after{transform:rotate(-45deg)}section>h2:focus-visible{outline:3px solid var(--ac2);outline-offset:2px}
+section.cl>:not(h2){display:none}section>h2+*{margin-top:10px}
+.rc{margin:6px 0 0}.rc summary{font-size:13px;padding:2px 0}.rc ol{margin:4px 0 0;padding-left:20px}.rc li{margin:3px 0}
+.src{font-size:13px;color:var(--mu);margin:6px 0 0}.src a{color:var(--ac)}
+.sync.on{border-left-color:#2e8b57}.acts2{display:flex;gap:8px;flex-wrap:wrap}.join{padding:12px;border:1px solid var(--ac2);border-radius:10px;background:var(--hi);margin:0 0 12px}
+pre.code{white-space:pre-wrap;font-size:12px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;margin:8px 0}
+ol.guide{padding-left:20px;margin:6px 0}ol.guide li{margin:0 0 10px}.warn{border-left:3px solid var(--ac2);padding:6px 10px;background:var(--hi);border-radius:0 8px 8px 0;font-size:14px}
+.sync{font-size:14px;margin:0 0 18px;padding:8px 12px;border-left:3px solid var(--ac);background:var(--cd);border-radius:0 8px 8px 0}
+.irow{display:grid;grid-template-columns:minmax(0,1fr) 84px auto;gap:6px;align-items:center;margin:6px 0}.irow .u{font-size:13px;color:var(--mu)}.nn{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;padding:8px;border:1px dashed var(--bd);border-radius:8px}
+textarea{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);min-height:90px}.ed{border:1px solid var(--ac);border-radius:10px;padding:12px;margin:10px 0}.tag{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);color:var(--mu);white-space:nowrap}
+.buy{color:#b5651d;font-weight:500}:root[data-theme=dark] .buy{color:#f0b550}@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .buy{color:#f0b550}}
+.lf{font-weight:500;color:var(--ac)}.pin{font-weight:600;color:var(--ac2)}
+.ban{display:flex;gap:8px;align-items:center;padding:4px 0}.ban span{flex:1}
+</style></head><body><main>
+<h1>Что приготовить?</h1>
+<p class="s" style="margin-bottom:6px">Ответьте на несколько вопросов и получите меню на неделю со списком покупок и стоимостью в сумах.</p>
+<div id="moveBox"></div>
+<p class="s sync" id="sync" role="status">Меню хранится на этом телефоне.</p>
+<div id="form">
+<section><h2>Кто ест</h2><div class="row">
+<div><label class="f" for="ad">Взрослых</label><input id="ad" type="number" min="1" max="10" value="2"></div>
+<div><label class="f" for="kids">Возраст детей через запятую</label><input id="kids" type="text" placeholder="например: 13, 17"></div></div></section>
+<section><h2>Что готовим</h2><div id="ml"></div></section>
+<section><h2>Как готовим</h2><div id="mode"></div><p class="s" style="margin:6px 0 0">Остатки получают только блюда, которые хорошо хранятся и разогреваются: супы, плов, рагу, паста.</p></section>
+<section><h2>Бюджет на неделю, сум</h2><input id="bud" type="number" min="100000" step="50000" value="700000" aria-label="Бюджет на неделю"><label class="f">Цены овощей по сезону</label><div id="season"></div></section>
+<section><h2>Тип питания</h2><div id="diet"></div><p class="s" style="margin:6px 0 0">Каждую неделю: рыба хотя бы раз, говядина не чаще 4 готовок, минимум 2 блюда без мяса — если это позволяют остальные ответы.</p></section>
+<section><h2>Кухни</h2><div id="cu"></div></section>
+<section><h2>Не люблю</h2><div id="dis"></div><p class="s" style="margin:6px 0 0">Чеснок, зелень и специи при отметке просто убираются из рецептов, остальное исключает блюдо целиком.</p><div id="bans"></div></section>
+<section><h2>Кухня и время</h2><div class="row">
+<div><label class="f" for="tmW">Время на блюдо в будни</label><select id="tmW"><option value="30">до 30 минут</option><option value="45">до 45 минут</option><option value="75" selected>до 1,5 часов</option><option value="200">без ограничений</option></select></div>
+<div><label class="f" for="tmE">В выходные</label><select id="tmE"><option value="45">до 45 минут</option><option value="75">до 1,5 часов</option><option value="200" selected>без ограничений</option></select></div></div>
+<label class="f">Техника (плита есть всегда)</label><div id="eq"></div></section>
+<section><h2 data-k="rules">Постоянные и любимые блюда</h2><div id="rulesBox"></div></section>
+<section><h2 data-k="my">Мои блюда</h2><div id="myBox"></div></section>
+<section id="homeSec"><h2 data-k="home">Что есть дома <small id="homeCnt" style="font-weight:400;color:var(--mu)"></small></h2><div id="prefBox" style="margin-bottom:8px"></div><div id="homeBox"></div></section>
+<button class="go" id="go">Составить меню</button></div>
+<div id="out"></div>
+<section id="famSec"><h2>Общее меню семьи</h2>
+<p class="s" style="margin:0 0 8px">Без подключения меню хранится только на этом телефоне. Чтобы вся семья видела одно меню и отмечала купленное, нужна бесплатная база данных Supabase. Настраивает один человек, один раз, примерно за 10 минут. Остальные подключаются по ссылке-приглашению.</p>
+<div id="famBox"></div>
+<details><summary>Как настроить: пошаговая инструкция</summary>
+<ol class="guide">
+<li><b>Зарегистрируйтесь в Supabase.</b> Откройте <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>, нажмите Start your project и войдите через почту или GitHub. Тариф Free бесплатный, карта не нужна.</li>
+<li><b>Создайте проект.</b> Нажмите New project. Имя — любое, например menu. Придумайте пароль базы и сохраните его: в приложении он не нужен, но пригодится вам. Регион выберите ближайший, например Central EU (Frankfurt). Подождите 1–2 минуты, пока проект создаётся.</li>
+<li><b>Создайте таблицу для меню.</b> В меню слева откройте SQL Editor, нажмите New query, вставьте код ниже и нажмите Run. Должно появиться Success. No rows returned. Если Supabase покажет предупреждение Potential issue detected, нажмите Run query: код только создаёт таблицу для меню и правила доступа к ней, ничего не удаляет.
+<pre class="code" id="sql">create table if not exists public.family_state (
+  id text primary key,
+  data jsonb not null,
+  updated_at timestamptz not null default now()
+);
+alter table public.family_state enable row level security;
+grant select, insert, update on public.family_state to anon;
+do $$ begin
+  if not exists (select 1 from pg_policies where tablename = 'family_state' and policyname = 'family read') then
+    create policy "family read" on public.family_state for select to anon using (true);
+  end if;
+  if not exists (select 1 from pg_policies where tablename = 'family_state' and policyname = 'family insert') then
+    create policy "family insert" on public.family_state for insert to anon with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where tablename = 'family_state' and policyname = 'family update') then
+    create policy "family update" on public.family_state for update to anon using (true) with check (true);
+  end if;
+end $$;</pre><button class="sw" id="fCopySql">Скопировать код</button></li>
+<li><b>Скопируйте ключ.</b> Слева внизу нажмите шестерёнку <b>Project Settings</b> → <b>API Keys</b>. В блоке <b>Publishable key</b>, в строке default, нажмите значок копирования справа от ключа sb_publishable_… Копируйте только этой кнопкой: ключ длинный и на экране обрезан. Вставьте его в поле «Publishable key» в приложении. Блок <b>Secret keys</b> ниже не трогайте.</li>
+<li><b>Скопируйте адрес проекта.</b> Он на другой странице: в том же меню слева, в разделе Integrations, откройте <b>Data API</b> (или слева значок <b>Integrations</b> → Data API). В блоке <b>API URL</b> нажмите <b>Copy</b> и вставьте адрес в поле «Адрес проекта» как есть: окончание /rest/v1/ приложение уберёт само. Переключатель Enable Data API на этой странице должен быть включён (зелёный). Второй способ найти адрес: зелёная кнопка <b>Connect</b> вверху экрана.</li>
+<li><b>Нажмите «Подключить» в приложении.</b> Приложение проверит связь и перенесёт ваше текущее меню в общее.</li>
+<li><b>Пригласите семью.</b> Нажмите «Отправить приглашение» и перешлите ссылку в семейный чат. На Android достаточно открыть её в Chrome и нажать «Подключиться». На iPhone приложение на экране «Домой» хранит данные отдельно от Safari: установите приложение, откройте его со значка и вставьте ссылку в поле «Есть ссылка-приглашение?».</li>
+</ol>
+<p class="warn"><b>Важно.</b> Никогда не вставляйте сюда secret key (sb_secret_…) или service_role: приложение его не примет. Publishable key и ссылка-приглашение открывают доступ к вашему меню: делитесь ими только с семьёй. Бесплатный проект Supabase засыпает, если им не пользоваться неделю; данные сохраняются, а разбудить его можно кнопкой Resume project на supabase.com.</p>
+</details></section>
+<section id="instSec"><h2>Установить на телефон</h2>
+<p class="ok" id="instDone" hidden style="margin:0 0 8px">Приложение уже установлено на этом устройстве.</p>
+<p class="s" style="margin:0 0 6px">После установки приложение открывается со своим значком, без адресной строки, и работает без интернета (кроме синхронизации общего меню).</p>
+<button class="go" id="instBtn" hidden style="margin:0 0 10px">Установить приложение</button>
+<p style="margin:0 0 6px"><b>iPhone:</b> откройте сайт в Safari → кнопка «Поделиться» (квадрат со стрелкой; в компактном виде — «•••» рядом с адресом) → «На экран «Домой»» → «Добавить». Если вы подключались к общему меню в Safari, откройте приложение со значка и вставьте ссылку-приглашение ещё раз.</p>
+<p style="margin:0"><b>Android:</b> откройте сайт в Chrome → меню ⋮ → «Установить приложение» или «Добавить на главный экран».</p></section>
+<p class="s" style="font-size:13px">Цены по умолчанию ориентировочные, для Ташкента; поправьте их в разделе «Цены продуктов». Данные хранятся на вашем телефоне и, если подключено общее меню, в вашем собственном проекте Supabase.</p>
+</main>
+<script src="data.js"></script>
+<script>
+{
+const {ING,SIDES,BASE}=window.DATA,SRC=window.DATA.SRC||{};
+const CAT=['Мясо и рыба','Крупы и макароны','Овощи и фрукты','Молочное и яйца','Прочее'];
+const R=window.DATA.R.split('\n').map((l,id)=>{const f=l.split('|');return{id,n:f[0],m:f[1],ty:f[2],t:+f[3],eq:f[4],eqs:[...f[4]],cu:f[5],pr:f[6],keep:f[7].includes('k'),soup:f[7].includes('h')?'h':f[7].includes('l')?'l':'',ig:f[8].split(' ').map(x=>{const[k,v]=x.split(':');return[k,+v]}),st:f.slice(9)}});
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const D=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'],DV=['в понедельник','во вторник','в среду','в четверг','в пятницу','в субботу','в воскресенье'];
+const ML=[['b','Завтрак'],['l','Обед'],['d','Ужин']],CN={u:'Узбекская',t:'Турецкая',e:'Европейская',a:'Азиатская'},PN={b:'говядина',c:'курица',f:'рыба',v:'без мяса'};
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let PR=LS.get('cp-pr',{}),A=LS.get('cp-adj',[0,0,0,0,0]),BAN=LS.get('cp-ban',[]),HOME=LS.get('cp-home',[]);
+let S={},G=[],op='',sdi=0;
+let RULES=LS.get('cp-rules',[]),FAV=LS.get('cp-fav',[]),BASEX=LS.get('cp-basex',[]);
+let MY=LS.get('cp-my',[]),INGX=LS.get('cp-ingx',{}),CUX=LS.get('cp-cux',[]),EQX=LS.get('cp-eqx',[]),ED=null;
+const RB=R.length,CNB={...CN},EQB=[['o','Духовка'],['m','Мультиварка'],['b','Блендер или смузимейкер'],['w','Микроволновка']];
+const DISB=[['onion','Лук'],['carrot','Морковь'],['tomato','Помидоры'],['cabbage','Капуста'],['pepper','Перец'],['milk','Молоко'],['fish','Рыба'],['garlic','Чеснок'],['greens','Зелень'],['spice','Специи']];
+const clean=(s,n)=>String(s==null?'':s).replace(/[<>"'`&\\|]/g,'').replace(/\s+/g,' ').trim().slice(0,n);
+const rid=p=>p+Math.random().toString(36).slice(2,10);
+const UN={g:'г',ml:'мл','шт':'шт','пуч':'пучок'},UPER={g:'кг',ml:'литр','шт':'штуку','пуч':'пучок'};
+function rebuildR(){for(const k in ING)if(/^x/.test(k))delete ING[k];for(const k in INGX)ING[k]=INGX[k];
+for(const k in CN)if(!(k in CNB))delete CN[k];CUX.forEach(c=>CN[c.k]=c.n);R.length=RB;
+MY.forEach(d=>{const ig=d.ig.filter(([k])=>ING[k]).map(([k,a])=>[k,a/d.srv]);R.push({id:R.length,n:d.n,m:d.m,ty:d.pr=='f'?'f':d.pr=='v'?'v':'m',t:d.t,eq:'',eqs:d.eq.slice(),cu:d.cu,pr:d.pr,keep:d.keep,soup:d.soup,ig,st:d.st,url:d.url,pc:ig.length?null:d.pc,my:d.id})});
+G.forEach(g=>{const r=R.find(x=>x.n==g.r.n);if(r)g.r=r})}
+rebuildR();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const RT={'p:f':'что-нибудь из рыбы','p:c':'что-нибудь с курицей','p:b':'что-нибудь с говядиной','p:v':'блюдо без мяса','soup':'суп'};
+const MLN={b:'завтрак',l:'обед',d:'ужин'};
+// ---------- общее меню семьи (Supabase) ----------
+const TAB=Math.random().toString(36).slice(2);
+const OK='Общее меню семьи подключено: изменения сразу видны у всех.',LOCAL='Меню хранится на этом телефоне. Чтобы вести одно меню всей семьёй, откройте раздел «Общее меню семьи» внизу.';
+let BOUGHT=LS.get('cp-bought',[]),CFG=LS.get('cp-sb',null),wT=0,writing=false,again=false,pend=false,lastSeen=0,pollT=0;
+const setSync=(t,ok)=>{const e=$('#sync');if(e){e.textContent=t;e.classList.toggle('on',!!ok)}};
+const planOut=()=>G.length?G.map(g=>({s:g.s,k:g.k,keep:g.keep,day:g.day,r:g.r.n,sd:g.sd,lock:g.lock,fix:!!g.fix,rt:g.rt||null})):null;
+const ruleOK=x=>x&&Number.isInteger(x.d)&&x.d>=0&&x.d<7&&['b','l','d'].includes(x.m)&&typeof x.t=='string'&&(x.t in RT||(x.t.startsWith('r:')&&R.some(r=>r.n==x.t.slice(2))));
+const PS=(k,v)=>{LS.set(k,v);sync()};
+const api=(c,q,o={})=>fetch(c.url+'/rest/v1/family_state'+q,{...o,headers:{apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json',...(o.headers||{})}});
+async function errText(r){let j=null;try{j=await r.json()}catch(e){}const c=j&&j.code;
+if(r.status==404||c=='PGRST205'||c=='42P01')return'Таблица не найдена. Выполните шаг 3 (SQL) ещё раз.';
+if(c=='42501')return'Нет прав на таблицу. Выполните шаг 3 (SQL) ещё раз.';
+if(r.status==401||r.status==403)return'Ключ не подходит. Скопируйте publishable key ещё раз (шаг 4).';
+if(r.status==540||r.status==503)return'Проект Supabase приостановлен или недоступен. Откройте его в supabase.com и нажмите Resume project.';
+return'Ошибка сервера '+r.status+'.'}
+function sync(){if(!CFG)return;pend=true;clearTimeout(wT);wT=setTimeout(push,800)}
+async function push(){if(!CFG)return;if(writing){again=true;return}writing=true;
+const b={v:1,at:Date.now(),tab:TAB,form:formGet(),plan:planOut(),home:HOME,ban:BAN,pr:PR,adj:A,bought:BOUGHT,rules:RULES,fav:FAV,basex:BASEX,my:MY,ingx:INGX,cux:CUX,eqx:EQX};
+try{const r=await api(CFG,'?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:CFG.fam,data:b,updated_at:new Date(b.at).toISOString()})});
+if(!r.ok)throw new Error(await errText(r));lastSeen=b.at;setSync(OK,true)}
+catch(e){setSync('Не сохранилось в общее меню: '+(e&&e.name=='TypeError'?'нет связи.':e.message)+' Повторю при следующем изменении.')}
+writing=false;if(again){again=false;return push()}pend=false}
+async function pull(){if(!CFG||pend||writing)return;
+try{const r=await api(CFG,'?id=eq.'+encodeURIComponent(CFG.fam)+'&select=data');if(!r.ok)throw new Error(await errText(r));const rows=await r.json();
+if(!Array.isArray(rows)||!rows.length)return push();
+const d=rows[0]&&rows[0].data;setSync(OK,true);
+if(d&&typeof d.at=='number'&&d.at>lastSeen){lastSeen=d.at;if(d.tab!==TAB&&!pend&&!writing)applyRemote(d)}}
+catch(e){setSync(e&&e.name=='TypeError'?'Нет связи с общим меню, показано сохранённое на этом телефоне.':e.message)}}
+function startPoll(){clearInterval(pollT);if(!CFG){setSync(LOCAL);return famHtml()}pull();pollT=setInterval(()=>{if(document.visibilityState!='hidden')pull()},15000);famHtml()}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible'&&CFG)pull()});
+addEventListener('online',()=>{if(CFG)pull()});
+const jwtRole=k=>{try{return JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role}catch(e){return''}};
+const b64e=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const b64d=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
+const inviteLink=()=>location.origin+location.pathname+'#join='+b64e(JSON.stringify({u:CFG.url,k:CFG.key,f:CFG.fam}));
+async function connect(url,key,fam){url=String(url||'').trim().replace(/\/+$/,'').replace(/\/rest\/v1$/,'');key=String(key||'').trim();
+if(!/^https:\/\/[^\s/?#]+$/.test(url))return'Адрес проекта должен выглядеть так: https://abcd1234.supabase.co';
+if(!key)return'Вставьте publishable key.';
+if(/^sb_secret_/.test(key)||jwtRole(key)=='service_role')return'Это секретный ключ, его нельзя вставлять в приложение. Нужен publishable key, он начинается с sb_publishable_.';
+const c={url,key,fam:/^[A-Za-z0-9_-]{6,40}$/.test(fam||'')?fam:'f'+Math.random().toString(36).slice(2,10)+Date.now().toString(36)};
+try{const r=await api(c,'?select=id&limit=1');if(!r.ok)return await errText(r)}catch(e){return'Нет связи с этим адресом. Проверьте адрес проекта и интернет.'}
+CFG=c;LS.set('cp-sb',CFG);lastSeen=0;startPoll();return''}
+const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform=='MacIntel'&&navigator.maxTouchPoints>1);
+const STANDALONE=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+const IOSNOTE='<p class="warn" style="margin:10px 0 0"><b>iPhone:</b> приложение на экране «Домой» хранит данные отдельно от Safari. После установки откройте приложение со значка и вставьте ссылку-приглашение ещё раз в поле «Есть ссылка-приглашение?».</p>';
+function famHtml(){const el=$('#famBox');if(!el)return;
+if(CFG){el.innerHTML='<p class="ok" style="margin:0 0 8px">Подключено к общему меню семьи.</p><p class="s" style="margin:0 0 8px">Отправьте ссылку-приглашение членам семьи, например в Telegram. Открыв её на телефоне, они сразу подключатся к этому же меню. Ссылка работает как ключ: не публикуйте её в открытых чатах.</p><div class="acts2"><button class="sw" id="fInv">Отправить приглашение</button>'+(IOS&&!STANDALONE?'<button class="sw" id="fCopyInv">Скопировать ссылку-приглашение</button>':'')+'<button class="sw" id="fOff">Отключить на этом телефоне</button></div>'+(IOS&&!STANDALONE?IOSNOTE:'')+'<p class="s" id="fMsg" style="margin:8px 0 0"></p>';return}
+const paste='<label class="f" for="fInvUrl" style="margin-top:0"><b>Есть ссылка-приглашение от семьи?</b> Скопируйте её из чата и вставьте сюда</label><input id="fInvUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://…#join=…"><div class="acts2" style="margin-top:10px"><button class="sw" id="fClip">Вставить из буфера</button></div><button class="go" id="fPaste" style="margin:10px 0 0">Подключиться по приглашению</button>';
+const manual='<h3 style="margin:18px 0 0">Или настройте общее меню сами (по инструкции ниже)</h3><label class="f" for="fUrl">Адрес проекта (Project URL)</label><input id="fUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://abcd1234.supabase.co"><label class="f" for="fKey">Publishable key</label><input id="fKey" type="text" autocomplete="off" placeholder="sb_publishable_..."><button class="go" id="fCon" style="margin:12px 0 0">Подключить</button>';
+el.innerHTML=JOIN?'<div class="join"><p style="margin:0 0 8px"><b>Вас пригласили в общее меню семьи.</b> После подключения меню на этом телефоне заменится общим.</p><button class="go" id="fJoin" style="margin:0">Подключиться</button></div><p class="s bad" id="fMsg" style="margin:0 0 8px"></p><details><summary>Другие способы подключения</summary>'+paste+manual+'</details>':paste+manual+'<p class="s bad" id="fMsg" style="margin:8px 0 0"></p>'}
+const NEWURL='https://bshamsiev.github.io/menu/',OLDHOST=/netlify\.app$/i.test(location.hostname);
+const moveData=()=>({v:1,at:Date.now(),tab:'move',form:formGet(),plan:planOut(),home:HOME,ban:BAN,pr:PR,adj:A,bought:BOUGHT,rules:RULES,fav:FAV,basex:BASEX,my:MY,ingx:INGX,cux:CUX,eqx:EQX,sb:CFG});
+const moveLink=()=>NEWURL+'#move='+b64e(JSON.stringify(moveData()));
+let MOVE=null;
+function moveHtml(){const el=$('#moveBox');if(!el)return;
+if(MOVE){el.innerHTML='<div class="join"><p style="margin:0 0 8px"><b>Перенос данных со старого адреса.</b> Анкета, меню, свои блюда, правила, цены и подключение к общему меню семьи будут перенесены на этот адрес. Данные, которые уже есть здесь, заменятся.</p><button class="go" id="mvDo" style="margin:0">Перенести</button><button class="sw" id="mvNo" style="margin-top:8px">Не переносить</button></div>';return}
+if(OLDHOST){el.innerHTML='<div class="join"><p style="margin:0 0 8px"><b>Приложение переехало на новый адрес:</b> <a href="'+NEWURL+'">'+NEWURL.replace('https://','')+'</a>. Здесь оно больше не будет обновляться.</p><p class="s" style="margin:0 0 8px">Нажмите «Перенести мои данные» — откроется новый адрес со всеми вашими данными. Затем установите его на экран «Домой», а старый значок удалите.</p><button class="go" id="mvGo" style="margin:0">Перенести мои данные</button><p class="s" style="margin:8px 0 4px"><b>iPhone, если новое приложение уже установлено на экран «Домой»:</b> скопируйте ссылку переноса и вставьте её в новом приложении в поле «Есть ссылка-приглашение?».</p><button class="sw" id="mvCopy">Скопировать ссылку переноса</button><p class="s" id="mvMsg" style="margin:6px 0 0"></p></div>';return}
+el.innerHTML=''}
+async function doMove(d){if(!d||typeof d!='object')return'Ссылка переноса повреждена.';applyRemote({...d,tab:'move'});saveForm();
+if(d.sb&&typeof d.sb=='object'&&typeof d.sb.url=='string'&&typeof d.sb.key=='string'){const r=await connect(d.sb.url,d.sb.key,d.sb.fam);if(r)return'Данные перенесены, но общее меню не подключилось: '+r}
+return''}
+try{const m=location.hash.match(/^#move=([A-Za-z0-9_-]+)$/);if(m){MOVE=JSON.parse(b64d(m[1]));history.replaceState(null,'',location.pathname+location.search)}}catch(e){MOVE=null}
+let JOIN=null;try{const m=location.hash.match(/^#join=([A-Za-z0-9_-]+)$/);if(m){const j=JSON.parse(b64d(m[1]));if(j&&typeof j.u=='string'&&typeof j.k=='string')JOIN=j;history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
+function applyRemote(d){if(!d||typeof d!='object')return;
+const sm=sanMy(d);INGX=sm.ingx;CUX=sm.cux;EQX=sm.eqx;MY=sm.my;LS.set('cp-ingx',INGX);LS.set('cp-cux',CUX);LS.set('cp-eqx',EQX);LS.set('cp-my',MY);rebuildR();buildChips();
+const names=new Set(R.map(r=>r.n)),labels=new Set(BASE.flatMap(([,l])=>l.map(([n])=>n))),arr=(x,ok)=>Array.isArray(x)?x.filter(ok):[];
+if(d.form&&typeof d.form=='object'){formSet(d.form);LS.set('cp-form',formGet())}
+BASEX=arr(d.basex,x=>x&&typeof x.n=='string'&&x.n.trim()&&x.n.length<=40&&Array.isArray(x.ks)).map(x=>({n:x.n.trim(),ks:x.ks.filter(k=>typeof k=='string'&&!!ING[k])}));BASEX.forEach(x=>labels.add(x.n));
+RULES=arr(d.rules,ruleOK).map(x=>({d:x.d,m:x.m,t:x.t}));FAV=arr(d.fav,n=>names.has(n));
+BAN=arr(d.ban,n=>names.has(n));HOME=arr(d.home,n=>labels.has(n));BOUGHT=arr(d.bought,k=>typeof k=='string'&&!!ING[k]);
+PR={};if(d.pr&&typeof d.pr=='object')for(const k in d.pr){const v=d.pr[k];if(ING[k.replace(/@w$/,'')]&&typeof v=='number'&&isFinite(v)&&v>=0)PR[k]=v}
+A=[0,1,2,3,4].map(i=>Array.isArray(d.adj)&&typeof d.adj[i]=='number'&&isFinite(d.adj[i])?d.adj[i]:0);
+let g2=[];if(Array.isArray(d.plan)){g2=d.plan.map(g=>({s:Array.isArray(g.s)?g.s.filter(x=>Array.isArray(x)&&x[0]>=0&&x[0]<7&&['b','l','d'].includes(x[1])):[],k:g.k=='B'?'B':'M',keep:!!g.keep,day:Math.min(6,Math.max(0,+g.day||0)),r:R.find(r=>r.n==g.r),sd:Number.isInteger(g.sd)&&SIDES[g.sd]?g.sd:null,lock:!!g.lock,fix:!!g.fix,rt:Object.keys(RT).includes(g.rt)?g.rt:null}));if(!g2.every(g=>g.r&&g.s.length))g2=[]}
+G=g2;LS.set('cp-rules',RULES);LS.set('cp-fav',FAV);LS.set('cp-basex',BASEX);LS.set('cp-ban',BAN);LS.set('cp-home',HOME);LS.set('cp-bought',BOUGHT);LS.set('cp-pr',PR);LS.set('cp-adj',A);LS.set('cp-plan',G.length?{G:planOut(),at:d.at}:null);
+read();bansHtml();rulesHtml();homeHtml();myHtml();op='';render()}
+
+// ---------- форма ----------
+const chips=(nm,tp,it,ck)=>it.map(([v,l])=>`<label class="chip"><input type="${tp}" name="${nm}" value="${v}"${ck.includes(v)?' checked':''}><span>${l}</span></label>`).join('');
+const wm=new Date().getMonth(),defSeason=(wm>=10||wm<=2)?'w':'s';
+$('#ml').innerHTML=chips('meal','checkbox',ML,['l','d']);
+$('#mode').innerHTML=chips('mode','radio',[['A','Будни: вечером с запасом на завтрашний обед; суббота: в обед на обед и ужин; воскресенье: ужин с запасом на понедельник'],['B','Всегда вечером: ужин с запасом на завтрашний обед'],['sep','Каждый приём готовлю отдельно']],['A']);
+$('#prefBox').innerHTML=chips('pref','checkbox',[['1','Сначала готовим из того, что есть дома']],[]);
+$('#season').innerHTML=chips('season','radio',[['s','Лето'],['w','Зима']],[defSeason]);
+$('#diet').innerHTML=chips('diet','radio',[['all','Всеядный'],['pesc','Без мяса, но с рыбой'],['veg','Вегетарианский']],['all']);
+
+function buildChips(add){const had=!!$('[name=cu]'),cur=had?{cu:val('cu'),eq:val('eq'),dis:val('dis')}:{cu:['u','t','e','a'],eq:['m','b','w'],dis:[]};
+const used=new Set(MY.map(d=>d.cu)),ueq=new Set(MY.flatMap(d=>d.eq)),uig=new Set(MY.flatMap(d=>d.ig.map(x=>x[0])));
+if(add){if(add.cu)cur.cu.push(add.cu);(add.eq||[]).forEach(e=>cur.eq.push(e))}
+$('#cu').innerHTML=chips('cu','checkbox',[['u','Узбекская'],['t','Турецкая'],['e','Европейская'],['a','Азиатская']].concat(CUX.filter(c=>used.has(c.k)).map(c=>[c.k,c.n])),cur.cu);
+$('#eq').innerHTML=chips('eq','checkbox',EQB.concat(EQX.filter(e=>ueq.has(e.k)).map(e=>[e.k,e.n])),cur.eq);
+$('#dis').innerHTML=chips('dis','checkbox',DISB.concat(Object.keys(INGX).filter(k=>uig.has(k)).map(k=>[k,INGX[k][0]])),cur.dis)}
+buildChips();
+const val=n=>$$(`[name=${n}]:checked`).map(x=>x.value);
+const formGet=()=>({ad:$('#ad').value,kids:$('#kids').value,bud:$('#bud').value,tmW:$('#tmW').value,tmE:$('#tmE').value,meal:val('meal'),mode:val('mode'),season:val('season'),diet:val('diet'),cu:val('cu'),dis:val('dis'),eq:val('eq'),pref:val('pref')});
+const formSet=f=>{for(const k of ['ad','kids','bud','tmW','tmE'])if(f[k]!=null)$('#'+k).value=f[k];for(const k of ['meal','mode','season','diet','cu','dis','eq','pref'])if(Array.isArray(f[k]))$$(`[name=${k}]`).forEach(x=>x.checked=f[k].includes(x.value))};
+function read(){const f=formGet(),ages=(f.kids.match(/\d+/g)||[]).map(Number),fa=a=>a<=3?.4:a<=6?.6:a<=12?.8:1,ad=Math.max(1,+f.ad||1);
+S={F:ad+ages.reduce((s,a)=>s+fa(a),0),n:ad+ages.length,bud:+f.bud||0,diet:f.diet[0]||'all',cu:f.cu,meals:f.meal,mode:f.mode[0]||'A',season:f.season[0]||defSeason,dis:f.dis,eq:f.eq,pref:(f.pref||[]).includes('1'),tW:+f.tmW,tE:+f.tmE}}
+const saveForm=()=>PS('cp-form',formGet());
+
+// ---------- цены и стоимость ----------
+const unitDiv=k=>ING[k][1]=='g'||ING[k][1]=='ml'?1000:1;
+const winter=k=>S.season=='w'&&ING[k][5]!=null;
+const pkey=k=>winter(k)?k+'@w':k;
+const base=k=>{const p=PR[pkey(k)];return p!=null?p:winter(k)?ING[k][5]:ING[k][2]};
+const price=k=>base(k)*(1+(+A[ING[k][3]]||0)/100);
+const fm=n=>(Math.round(n/100)*100).toLocaleString('ru-RU')+' сум';
+const ingOf=g=>g.r.ig.filter(([k])=>!(ING[k][6]&&S.dis.includes(k))).concat(g.sd!=null?SIDES[g.sd][1]:[]);
+const costG=g=>(ingOf(g).reduce((s,[k,a])=>s+a/unitDiv(k)*price(k),0)+(g.r.pc||0))*S.F;
+const homeKeys=()=>{const s=new Set();BASE.forEach(([,l])=>l.forEach(([n,ks])=>{if(HOME.includes(n))ks.forEach(k=>s.add(k))}));BASEX.forEach(x=>{if(HOME.includes(x.n))x.ks.forEach(k=>s.add(k))});return s};
+function shop(){const need={};G.forEach(g=>{const w=g.s.length*S.F;ingOf(g).forEach(([k,a])=>need[k]=(need[k]||0)+a*w)});const hk=homeKeys(),buy=[],home=[];
+Object.entries(need).forEach(([k,q])=>{if(hk.has(k))return home.push(k);const pk=ING[k][4],u=ING[k][1];let b,n=0;
+if(pk>0){n=Math.ceil(q/pk-1e-9);b=n*pk}else b=u=='пуч'?Math.ceil(q):Math.ceil(q/50)*50;
+buy.push({k,q,b,n,c:b/unitDiv(k)*price(k),e:q/unitDiv(k)*price(k)})});
+const approx=[],nop=[];G.forEach(g=>{if(g.r.pc)approx.push({n:g.r.n,c:g.r.pc*S.F*g.s.length});else if(g.r.my&&!g.r.ig.length&&!nop.includes(g.r.n))nop.push(g.r.n)});return{buy,home,approx,nop}}
+const qt=(k,q)=>{const u=ING[k][1];if(u=='шт')return(Math.round(q*10)/10).toLocaleString('ru-RU')+' шт';if(u=='пуч')return(Math.round(q*10)/10).toLocaleString('ru-RU')+' пуч.';return q>=1000?(Math.round(q/10)/100).toLocaleString('ru-RU')+(u=='g'?' кг':' л'):Math.round(q/5)*5+(u=='g'?' г':' мл')};
+let HV=new Set();
+const haveSet=()=>{const s=homeKeys();BOUGHT.forEach(k=>s.add(k));return s};
+const missOf=(ig,have)=>[...new Set(ig.map(x=>x[0]).filter(k=>ING[k]&&!ING[k][6]&&!have.has(k)))];
+const shopTotal=()=>{const s=shop();return s.buy.reduce((a,x)=>a+x.c,0)+s.approx.reduce((a,x)=>a+x.c,0)};
+
+// ---------- подбор блюд ----------
+const dietOK=r=>S.diet=='all'||(S.diet=='pesc'&&r.ty!='m')||(S.diet=='veg'&&r.ty=='v');
+const pool=(k,day)=>R.filter(r=>r.m==k&&!BAN.includes(r.n)&&S.cu.includes(r.cu)&&dietOK(r)&&r.eqs.every(c=>S.eq.includes(c))&&r.t<=(day>=5?S.tE:S.tW)&&!r.ig.some(([x])=>S.dis.includes(x)&&!ING[x][6]));
+const gp=g=>{let p=pool(g.k,g.day);if(g.rt){const q=p.filter(r=>g.rt=='soup'?!!r.soup:'p:'+r.pr==g.rt);if(q.length)p=q}if(g.keep){const q=p.filter(r=>r.keep);if(q.length)p=q}return p};
+const setR=(g,r)=>{g.r=r;g.sd=null;if(r.soup=='l'){const o=SIDES.map((s,i)=>i).filter(i=>!SIDES[i][1].some(([k])=>S.dis.includes(k)));if(o.length)g.sd=o[sdi++%o.length]}};
+const mains=()=>G.filter(g=>g.k=='M'&&g.r);
+const cnt=()=>{const c={b:0,c:0,f:0,v:0};mains().forEach(g=>c[g.r.pr]=(c[g.r.pr]||0)+1);return c};
+let canF=false,canV=0;
+const viol=()=>{const c=cnt();let v=0;if(canF&&!c.f)v++;if(S.diet=='all'&&c.b>4)v+=c.b-4;v+=Math.max(0,Math.min(2,canV)-c.v);return v};
+function struct(){const M=S.meals,pair=M.includes('l')&&M.includes('d')&&S.mode!='sep',out=[];
+const add=(s,k,kp)=>{const q=s.filter(([,m])=>M.includes(m));if(q.length)out.push({s:q,k,keep:kp&&q.length>1,day:q[0][0],r:null,sd:null,lock:false})};
+if(M.includes('b'))for(let d=0;d<7;d++)add([[d,'b']],'B',false);
+if(!pair)for(let d=0;d<7;d++){add([[d,'l']],'M',false);add([[d,'d']],'M',false)}
+else if(S.mode=='B')for(let d=0;d<7;d++)add([[d,'d'],[(d+1)%7,'l']],'M',true);
+else{for(let d=0;d<4;d++)add([[d,'d'],[d+1,'l']],'M',true);add([[4,'d']],'M',false);add([[5,'l'],[5,'d']],'M',true);add([[6,'l']],'M',false);add([[6,'d'],[0,'l']],'M',true)}
+return out}
+const sig=g=>JSON.stringify(g.s);
+function gen(){read();sdi=0;op='';BOUGHT=[];LS.set('cp-bought',BOUGHT);
+if(!S.meals.length)return msg('Отметьте хотя бы один приём пищи.');
+const old=G;G=struct();S.miss=[];
+RULES.forEach(x=>{const nm=D[x.d]+', '+MLN[x.m],g=G.find(g=>g.s.some(([d,m])=>d==x.d&&m==x.m));
+if(!g)return S.miss.push(`«${nm}» не применено: ${MLN[x.m]} не отмечен в «Что готовим».`);
+if(g.fix||g.rt)return S.miss.push(`«${nm}» не применено: на этот приём уже действует другое правило (блюдо готовится с запасом на несколько приёмов).`);
+if(x.t.startsWith('r:')){const r=R.find(r=>r.n==x.t.slice(2));if(!r)return;if(r.m!=g.k)return S.miss.push(`«${nm}» не применено: ${r.n} — ${r.m=='B'?'завтрак':'обед или ужин'}.`);setR(g,r);g.fix=true}
+else{if(g.k=='B')return S.miss.push(`«${nm}»: тип блюда задаётся только для обеда и ужина.`);g.rt=x.t}});
+if(G.some(g=>!gp(g).length))return msg('Под эти условия не нашлось блюд. Уберите часть ограничений: «не люблю», скрытые блюда, кухни или лимит времени.');
+G.forEach(g=>{if(g.fix)return;const o=old.find(o=>o.lock&&o.r&&sig(o)==sig(g));if(o&&gp(g).some(r=>r.id==o.r.id)){g.r=o.r;g.sd=o.sd;g.lock=true}});
+const ms=G.filter(g=>g.k=='M');canF=S.diet!='veg'&&!S.dis.includes('fish')&&ms.some(g=>gp(g).some(r=>r.pr=='f'));canV=ms.filter(g=>gp(g).some(r=>r.pr=='v')).length;
+const HK=homeKeys(),used=G.filter(g=>g.r).map(g=>g.r.id);let pp='',pc='';
+G.forEach(g=>{if(g.r){if(g.k=='M'){pp=g.r.pr;pc=g.r.cu}return}let best=null,bs=1e9;gp(g).forEach(r=>{const sc=Math.random()*3-(FAV.includes(r.n)?1.5:0)+(S.pref?missOf(r.ig,HK).length*2.5:0)+used.filter(x=>x==r.id).length*10+(g.k=='M'&&r.pr==pp?4:0)+(g.k=='M'&&r.cu==pc?2:0);if(sc<bs){bs=sc;best=r}});used.push(best.id);if(g.k=='M'){pp=best.pr;pc=best.cu}setR(g,best)});
+fixNorms();
+for(let i=0;i<200&&shopTotal()>S.bud;i++){let w=null,wc=0;const v0=viol();
+G.forEach(g=>{if(g.lock||g.fix)return;const c=costG(g)*g.s.length;if(c<=wc)return;const cur=g.r,sd=g.sd,a=gp(g).filter(x=>{if(x.id==cur.id)return false;setR(g,x);const ok=costG(g)<costG({r:cur,sd})*.85&&viol()<=v0;return ok});g.r=cur;g.sd=sd;if(a.length){wc=c;w=[g,a]}});
+if(!w)break;const us=G.map(g=>g.r.id),fr=w[1].filter(r=>!us.includes(r.id)),l=fr.length?fr:w[1];setR(w[0],l[Math.random()*l.length|0])}
+save();render()}
+function fixNorms(){for(let i=0;i<30;i++){const v=viol();if(!v)return;let done=false;const us=G.map(g=>g.r.id);
+const gs=G.filter(g=>g.k=='M'&&!g.lock&&!g.fix).sort(()=>Math.random()-.5);
+for(const g of gs){const cur=g.r,sd=g.sd;const opts=gp(g).filter(r=>r.id!=cur.id).sort((a,b)=>us.includes(a.id)-us.includes(b.id)||Math.random()-.5);
+for(const r of opts){setR(g,r);if(viol()<v){done=true;break}}if(done)break;g.r=cur;g.sd=sd}
+if(!done)return}}
+const msg=t=>{$('#out').innerHTML=`<div class="msg">${t}</div>`;enh()};
+
+// ---------- сохранение ----------
+const save=()=>PS('cp-plan',{G:planOut(),at:Date.now()});
+function load(){const p=LS.get('cp-plan',null);if(!p||!Array.isArray(p.G))return false;const g2=p.G.map(g=>({...g,fix:!!g.fix,rt:Object.keys(RT).includes(g.rt)?g.rt:null,r:R.find(r=>r.n==g.r)}));if(g2.some(g=>!g.r))return false;G=g2;return true}
+
+// ---------- отображение ----------
+const slotG=(d,m)=>G.find(g=>g.s.some(([x,y])=>x==d&&y==m));
+const info=(g,d,m)=>{if(g.s.length<2)return'';const[d0,m0]=g.s[0];if(d0==d&&m0==m){const n=g.s.length-1;return`<br><b class="lf">Готовим с запасом: хватит ещё на ${n} ${n==1?'приём':'приёма'}</b>`}return`<br><b class="lf">Остатки: готовили ${DV[d0]} ${m0=='l'?'днём':'вечером'}</b>`};
+const soupN=g=>g.sd!=null?`<br><b class="lf">Лёгкий суп: добавьте второе (${SIDES[g.sd][0]})</b>`:g.r.soup=='h'?'<br><b class="lf">Сытный суп, второе не нужно</b>':'';
+const amt=(k,a)=>{const v=a*S.F,u=ING[k][1];return ING[k][0].toLowerCase()+' '+(u=='шт'?(Math.round(v*10)/10).toLocaleString('ru-RU')+' шт':u=='пуч'?(Math.round(v*10)/10).toLocaleString('ru-RU')+' пуч.':Math.round(v/5)*5+(u=='g'?' г':' мл'))};
+const srcL=r=>{if(r.my)return r.url?`<p class="src"><a href="${esc(r.url)}" target="_blank" rel="noopener">Открыть рецепт (${esc(r.url.replace(/^https:\/\/(www\.)?/,'').split(/[/?#]/)[0])})</a></p>`:'';const s=SRC[r.n];if(s)return`<p class="src">Пошаговые фото: <a href="${s[0]}" target="_blank" rel="noopener">eda.ru, ${s[1]=='рецепт'?'рецепт':'подборка рецептов'}</a></p>`;const q=encodeURIComponent(r.n+' рецепт пошагово с фото');return`<p class="src">Проверенного источника нет: <a href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener">найти пошаговые фото</a></p>`};
+const rc=g=>`<details class="rc"><summary>Рецепт</summary><p class="s" style="margin:4px 0">${ingOf(g).length?`На ${S.n} чел.: ${ingOf(g).map(([k,a])=>amt(k,a)).join(', ')}`:'Продукты не указаны.'}</p><ol>${g.r.st.concat(g.sd!=null?[SIDES[g.sd][2]]:[]).map(x=>`<li>${x}</li>`).join('')}</ol>${srcL(g.r)}</details>`;
+function picker(g,d,m){const us=G.map(x=>x.r.id),opts=gp(g).filter(r=>r.id!=g.r.id).map(r=>{const t={r,sd:null};if(r.soup=='l')t.sd=g.sd!=null?g.sd:0;return[r,costG(t),r.my&&!r.ig.length?99:missOf(ingOf(t),HV).length]}).sort((a,b)=>a[2]-b[2]||a[1]-b[1]);
+return`<div class="pick" data-d="${d}" data-m="${m}"><div class="acts"><button class="sw" data-act="lock">${g.lock?'Открепить':'Закрепить'}</button><button class="sw" data-act="fav">${FAV.includes(g.r.n)?'★ Убрать из любимых':'☆ В любимые'}</button><button class="sw" data-act="rnd">Случайное</button><button class="sw" data-act="ban">Больше не предлагать</button><button class="sw" data-act="close">Закрыть</button></div>`+
+(opts.length?'<p class="s" style="margin:0 0 4px;font-size:13px">Сначала блюда, для которых меньше всего докупать.</p>'+opts.map(([r,c,mc])=>`<button class="opt" data-act="pick" data-r="${r.id}">${r.n} <small>· ${mc==0?'<span class="ok">всё есть дома</span>':mc==99?'продукты не указаны':'докупить '+mc+' прод.'} · ${CN[r.cu]} · ${r.t} мин · ${fm(c)}${us.includes(r.id)?' · уже в меню':''}</small></button>`).join(''):'<p class="s" style="margin:0">Других подходящих блюд нет.</p>')+'</div>'}
+const needL=(g,d,m)=>{if(g.s[0][0]!=d||g.s[0][1]!=m)return'';if(g.r.my&&!g.r.ig.length)return g.r.pc?'<br><span class="buy">Докупить: продукты по рецепту</span>':'';const ms=missOf(ingOf(g),HV);return ms.length?`<br><span class="buy">Докупить: ${ms.map(k=>ING[k][0].toLowerCase()).join(', ')}</span>`:'<br><span class="ok">Всё есть дома ✓</span>'};
+const row=(d,m,l)=>{const g=slotG(d,m);if(!g)return'';const k=d+'-'+m;return`<div class="ml"><em>${l}</em><span>${FAV.includes(g.r.n)?'<span class="pin">★</span> ':''}${g.r.n}<small>${g.r.my?'моё блюдо · ':''}${CN[g.r.cu]} кухня, ${g.r.t} мин, ${g.r.my&&!g.r.ig.length&&!g.r.pc?'цена не учтена':(g.r.pc?'≈ ':'')+fm(costG(g))+' на '+S.n+' чел.'}${g.lock?' · <span class="pin">закреплено</span>':''}${g.fix?' · <span class="pin">постоянное блюдо</span>':''}${g.rt?' · по правилу: '+RT[g.rt]:''}${info(g,d,m)}${soupN(g)}${needL(g,d,m)}</small>${rc(g)}${op==k?picker(g,d,m):''}</span><button class="sw" data-act="open" data-d="${d}" data-m="${m}" aria-expanded="${op==k}">${op==k?'Скрыть':'Изменить'}</button></div>`};
+function todayHtml(){const t=(new Date().getDay()+6)%7,rows=ML.map(([m,l])=>row(t,m,l)).join('');if(!rows)return'';
+const cook=G.filter(g=>g.s[0][0]==t),tom=G.filter(g=>g.s.length>1&&g.s[0][0]==t);
+return`<section class="today"><h2>Сегодня, ${D[t].toLowerCase()}</h2>${cook.length?`<p class="s" style="margin:0 0 6px">Готовим сегодня: ${cook.map(g=>g.r.n).join(', ')}.${tom.length?' Часть оставьте на следующий приём.':''}</p>`:'<p class="s" style="margin:0 0 6px">Сегодня ничего не готовим, едим остатки.</p>'}${rows}</section>`}
+// ---------- мои блюда ----------
+function sanMy(d){const ok=(re,s)=>typeof s=='string'&&re.test(s),num=(v,a,b)=>typeof v=='number'&&isFinite(v)&&v>=a&&v<=b;
+const ingx={};if(d.ingx&&typeof d.ingx=='object')for(const k in d.ingx){const v=d.ingx[k];if(ok(/^x[a-z0-9]{4,12}$/,k)&&Array.isArray(v)&&clean(v[0],40)&&['g','ml','шт','пуч'].includes(v[1])&&num(v[2],0,1e8)&&[0,1,2,3,4].includes(v[3]))ingx[k]=[clean(v[0],40),v[1],v[2],v[3],v[1]=='шт'?1:0,null,0]}
+const cux=(Array.isArray(d.cux)?d.cux:[]).filter(c=>c&&ok(/^xc[a-z0-9]{4,12}$/,c.k)&&clean(c.n,20)).map(c=>({k:c.k,n:clean(c.n,20)}));
+const eqx=(Array.isArray(d.eqx)?d.eqx:[]).filter(c=>c&&ok(/^xe[a-z0-9]{4,12}$/,c.k)&&clean(c.n,30)).map(c=>({k:c.k,n:clean(c.n,30)}));
+const bn=new Set(R.slice(0,RB).map(r=>r.n)),cuk=new Set(['u','t','e','a',...cux.map(c=>c.k)]),eqk=new Set(['o','m','b','w',...eqx.map(e=>e.k)]),seen=new Set();
+const my=(Array.isArray(d.my)?d.my:[]).filter(x=>x&&ok(/^xd[a-z0-9]{4,12}$/,x.id)&&clean(x.n,60)&&!bn.has(clean(x.n,60))&&['B','M'].includes(x.m)&&['b','c','f','v'].includes(x.pr)&&cuk.has(x.cu)&&num(x.t,1,600)&&num(x.srv,1,20)).map(x=>({id:x.id,n:clean(x.n,60),m:x.m,pr:x.pr,cu:x.cu,t:Math.round(x.t),srv:Math.round(x.srv),
+eq:(Array.isArray(x.eq)?x.eq:[]).filter(e=>eqk.has(e)),keep:!!x.keep,soup:['h','l'].includes(x.soup)?x.soup:'',
+ig:(Array.isArray(x.ig)?x.ig:[]).filter(a=>Array.isArray(a)&&(ING[a[0]]&&!/^x/.test(a[0])||ingx[a[0]])&&num(a[1],0.001,1e6)).map(a=>[a[0],a[1]]).slice(0,40),
+pc:num(x.pc,0,1e8)?x.pc:null,st:(Array.isArray(x.st)?x.st:[]).map(s=>clean(s,300)).filter(Boolean).slice(0,20),url:typeof x.url=='string'&&/^https:\/\/[^\s<>"']+$/.test(x.url)&&x.url.length<600?x.url:''})).filter(x=>!seen.has(x.n)&&seen.add(x.n));
+return{ingx,cux,eqx,my}}
+const similarIng=n=>{const q=normN(n);if(q.length<3)return null;for(const k in ING){const nm=normN(ING[k][0]),w=nm.split(/[ (,]/)[0];if(nm==q||w==q||(q.length>=4&&(w.startsWith(q.slice(0,Math.max(4,q.length-2)))||q.startsWith(w.slice(0,Math.max(4,w.length-2))))))return k}
+const SYN={'томат':'tomato','томаты':'tomato','помидор':'tomato','картошка':'potato','яйцо':'egg','чесночок':'garlic','кинза':'greens','укроп':'greens','петрушка':'greens','зелень':'greens','говяжий фарш':'beef','фарш':'beef','куриное филе':'chicken','филе курицы':'chicken','молоко':'milk','кефир':'kefir','катык':'kefir','сливочное масло':'butter','растительное масло':'oil','масло':'oil','мука':'flour','сахар':'sugar','лепешка':'lep','батон':'baton','хлеб':'buh'};return SYN[q]||null};
+const UMAP={'г':'g','гр':'g','грамм':'g','граммов':'g','кг':'kg','мл':'ml','л':'l','литр':'l','шт':'шт','штук':'шт','штуки':'шт','пучок':'пуч','пуч':'пуч','пучка':'пуч'};
+const TPL=`Название: 
+Приём: обед и ужин | завтрак
+Тип: говядина | курица | рыба | без мяса
+Кухня: узбекская | турецкая | европейская | азиатская | другая (напишите какая)
+Время, мин: 
+Порций: 
+Техника: плита | духовка | мультиварка | блендер | микроволновка | другая (напишите какая)
+Хорошо хранится: да | нет
+Суп: нет | сытный | лёгкий
+Продукты:
+- название; количество; г | мл | шт | пучок
+Шаги:
+1. 
+Ссылка: `;
+const AIP='Перепиши рецепт ниже строго в этот шаблон. Оставь в каждой строке шаблона одно подходящее значение. Количество продуктов пиши числом в граммах, миллилитрах, штуках или пучках (ложки, стаканы и щепотки переведи в граммы или миллилитры; соль, перец и воду не пиши). Порций — на сколько человек рассчитан рецепт. Отвечай только заполненным шаблоном, без пояснений.\n\n'+TPL+'\n\nРецепт:\n';
+function newED(){return{id:null,n:'',m:'M',pr:'v',cu:'u',cun:'',t:45,srv:4,eq:[],eqn:'',keep:true,soup:'',ig:[],pc:'',st:'',url:'',msg:'',force:false}}
+function edFrom(d){return{id:d.id,n:d.n,m:d.m,pr:d.pr,cu:d.cu,cun:'',t:d.t,srv:d.srv,eq:d.eq.slice(),eqn:'',keep:d.keep,soup:d.soup,ig:d.ig.map(([k,a])=>({k,a:String(a)})),pc:d.pc==null?'':String(d.pc),st:d.st.join('\n'),url:d.url,msg:'',force:false}}
+function syncED(){if(!ED||!$('#eN'))return;const v=id=>$('#'+id).value;ED.n=v('eN');ED.m=v('eM');ED.pr=v('eP');ED.cu=v('eC');ED.cun=$('#eCn')?v('eCn'):'';ED.t=v('eT');ED.srv=v('eS');ED.eq=$$('.eqc:checked').map(x=>x.value);ED.eqn=v('eEn');ED.keep=$('#eK').checked;ED.soup=v('eSo');ED.pc=v('ePc');ED.st=v('eSt');ED.url=v('eU');
+$$('.irow').forEach((r,i)=>{const it=ED.ig[i];if(!it)return;it.k=r.querySelector('.ri').value;it.a=r.querySelector('.ra').value;if(it.k=='+'){it.nn=it.nn||{u:'g',c:'2'};const q=s=>r.querySelector(s);if(q('.nnn')){it.nn.n=q('.nnn').value;it.nn.u=q('.nnu').value;it.nn.p=q('.nnp').value;it.nn.c=q('.nnc').value}}})}
+const ingOpts=sel=>'<option value="">— выберите —</option>'+Object.entries(ING).sort((a,b)=>a[1][0].localeCompare(b[1][0],'ru')).map(([k,v])=>`<option value="${k}"${k==sel?' selected':''}>${esc(v[0])}</option>`).join('')+`<option value="+"${sel=='+'?' selected':''}>+ новый продукт…</option>`;
+function edHtml(){const e=ED,o=(v,l,s)=>`<option value="${v}"${v==s?' selected':''}>${l}</option>`;
+return`<div class="ed"><h3 style="margin:0 0 6px">${e.id?'Изменить блюдо':'Новое блюдо'}</h3>
+<label class="f" for="eN">Название *</label><input id="eN" type="text" maxlength="60" value="${esc(e.n)}">
+<div class="row"><div><label class="f" for="eM">Приём пищи *</label><select id="eM">${o('M','Обед и ужин',e.m)+o('B','Завтрак',e.m)}</select></div><div><label class="f" for="eP">Тип *</label><select id="eP">${o('b','Говядина',e.pr)+o('c','Курица',e.pr)+o('f','Рыба',e.pr)+o('v','Без мяса',e.pr)}</select></div></div>
+<label class="f" for="eC">Кухня *</label><select id="eC">${Object.entries(CN).map(([k,v])=>o(k,esc(v),e.cu)).join('')+o('+','+ новая кухня…',e.cu)}</select>${e.cu=='+'?`<input id="eCn" type="text" maxlength="20" placeholder="Например: грузинская" value="${esc(e.cun)}" style="margin-top:6px">`:''}
+<div class="row"><div><label class="f" for="eT">Время, мин *</label><input id="eT" type="number" min="5" max="600" value="${esc(e.t)}"></div><div><label class="f" for="eS">Рецепт на сколько порций *</label><input id="eS" type="number" min="1" max="20" value="${esc(e.srv)}"></div></div>
+<label class="f">Техника (плита есть всегда)</label><div>${EQB.concat(EQX.map(x=>[x.k,x.n])).map(([k,n])=>`<label class="chip"><input type="checkbox" class="eqc" value="${k}"${e.eq.includes(k)?' checked':''}><span>${esc(n)}</span></label>`).join('')}</div><input id="eEn" type="text" maxlength="30" placeholder="Другая техника, например: мангал" value="${esc(e.eqn)}">
+<div class="row"><div><label class="f" style="display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" id="eK"${e.keep?' checked':''}> Хорошо хранится и разогревается</label></div><div><label class="f" for="eSo">Суп?</label><select id="eSo">${o('','Не суп',e.soup)+o('h','Сытный суп (второе не нужно)',e.soup)+o('l','Лёгкий суп (нужно второе)',e.soup)}</select></div></div>
+<label class="f">Продукты на ${esc(e.srv)||'…'} порц.: количество в граммах, мл, штуках или пучках</label>
+${e.ig.map((it,i)=>{const u=it.k&&it.k!='+'&&ING[it.k]?UN[ING[it.k][1]]:it.k=='+'?(UN[(it.nn||{}).u]||'г'):'';return`<div class="irow"><select class="ri" aria-label="Продукт">${ingOpts(it.k)}</select><input class="ra" type="number" min="0" step="any" value="${esc(it.a)}" aria-label="Количество"><span><span class="u">${u}</span> <button class="sw" data-mact="delrow" data-i="${i}" aria-label="Удалить строку">✕</button></span>${it.k=='+'?`<div class="nn"><input class="nnn" type="text" maxlength="40" placeholder="Название продукта" value="${esc((it.nn||{}).n||'')}"><select class="nnu">${['g','ml','шт','пуч'].map(x=>o(x,'Единица: '+UN[x],(it.nn||{}).u||'g')).join('')}</select><input class="nnp" type="number" min="0" placeholder="Цена за ${UPER[(it.nn||{}).u||'g']}, сум" value="${esc((it.nn||{}).p||'')}"><select class="nnc">${CAT.map((c,ci)=>o(String(ci),c,String((it.nn||{}).c||'2'))).join('')}</select></div>`:''}${it.w?`<small class="bad" style="grid-column:1/-1">${esc(it.w)}</small>`:''}</div>`}).join('')}
+<button class="sw" data-mact="addrow">+ Продукт</button>
+<label class="f" for="ePc">Или примерная цена одной порции, сум (если продукты не указаны)</label><input id="ePc" type="number" min="0" step="500" value="${esc(e.pc)}">
+<label class="f" for="eSt">Шаги приготовления (каждый с новой строки)</label><textarea id="eSt">${esc(e.st)}</textarea>
+<label class="f" for="eU">Ссылка на рецепт (Pinterest, сайт, видео)</label><input id="eU" type="text" inputmode="url" placeholder="https://…" value="${esc(e.url)}">
+<p class="${e.force?'warn':'s bad'}" style="margin:10px 0 0" id="eMsg">${esc(e.msg)}</p>
+<div class="acts2" style="margin-top:10px"><button class="go" data-mact="save" style="margin:0;width:auto;padding:12px 22px">${e.force?'Сохранить всё равно':'Сохранить'}</button><button class="sw" data-mact="cancel">Отмена</button>${e.id?'<button class="sw" data-mact="del">Удалить блюдо</button>':''}</div></div>`}
+function myHtml(){const el=$('#myBox');if(!el)return;
+const lst=MY.length?MY.map((d,i)=>`<div class="ban"><span><b>${esc(d.n)}</b><br><span class="tag">${d.m=='B'?'завтрак':'обед и ужин'}</span> <span class="tag">${esc(CN[d.cu]||'')}</span> <span class="tag">${d.ig.length?'по продуктам':d.pc!=null?'примерная цена':'цена не учтена'}</span></span><button class="sw" data-mact="edit" data-i="${i}">Изменить</button></div>`).join(''):'<p class="s" style="margin:0 0 8px">Своих блюд пока нет.</p>';
+el.innerHTML='<p class="s" style="margin:0 0 8px">Добавляйте свои рецепты, например из Pinterest. Они попадают в меню, бюджет и список покупок наравне со встроенными и видны всей семье при общем меню.</p>'+lst+
+(ED?edHtml():'<div class="acts2" style="margin-top:8px"><button class="go" data-mact="new" style="margin:0;width:auto;padding:12px 22px">+ Добавить блюдо</button></div>'+
+'<details style="margin-top:10px"><summary>Добавить из текста рецепта (с помощью ИИ)</summary><ol class="guide"><li>Нажмите «Скопировать запрос для ИИ» и вставьте его в Claude или ChatGPT.</li><li>Сразу после запроса вставьте текст рецепта (из Pinterest, сайта, сообщения) и отправьте.</li><li>Скопируйте ответ, вставьте его в поле ниже и нажмите «Разобрать». Проверьте поля и сохраните.</li></ol><button class="sw" data-mact="aip">Скопировать запрос для ИИ</button><textarea id="eImp" placeholder="Вставьте сюда заполненный шаблон" style="margin-top:8px"></textarea><button class="sw" data-mact="parse" style="margin-top:8px">Разобрать</button><p class="s bad" id="impMsg" style="margin:6px 0 0"></p></details>')}
+function parseTpl(txt){const e=newED(),L=String(txt||'').split(/\r?\n/);let sec='';const g=(s,re)=>re.test(normN(s));
+for(let raw of L){const l=raw.trim();if(!l)continue;const m=l.match(/^([^:]{2,30}):\s*(.*)$/),k=m?normN(m[1]):'',v=m?m[2].trim():'';
+if(m&&/^(название|блюдо)/.test(k)){e.n=clean(v,60);sec='';continue}
+if(m&&/^при[её]м/.test(k)){e.m=g(v,/завтрак/)?'B':'M';sec='';continue}
+if(m&&/^тип/.test(k)){e.pr=g(v,/говя/)?'b':g(v,/кур|птиц/)?'c':g(v,/рыб/)?'f':'v';sec='';continue}
+if(m&&/^кухня/.test(k)){const q=normN(v),f=Object.entries(CN).find(([,n])=>normN(n).slice(0,5)==q.slice(0,5));if(f)e.cu=f[0];else if(q){e.cu='+';e.cun=clean(v,20)}sec='';continue}
+if(m&&/^время/.test(k)){e.t=parseInt(v)||45;sec='';continue}
+if(m&&/^порц/.test(k)){e.srv=parseInt(v)||4;sec='';continue}
+if(m&&/^техник/.test(k)){const q=normN(v);e.eq=[];if(/духов/.test(q))e.eq.push('o');if(/мульти/.test(q))e.eq.push('m');if(/блендер|смузи/.test(q))e.eq.push('b');if(/микро/.test(q))e.eq.push('w');const other=v.split(/[,;|]/).map(x=>x.trim()).filter(x=>x&&!/плит|духов|мульти|блендер|смузи|микро/i.test(x));if(other[0]){const ex=EQX.find(x=>normN(x.n)==normN(other[0]));if(ex)e.eq.push(ex.k);else e.eqn=clean(other[0],30)}sec='';continue}
+if(m&&/^хорошо/.test(k)){e.keep=/^да/.test(normN(v));sec='';continue}
+if(m&&/^суп/.test(k)){e.soup=/сытн/.test(normN(v))?'h':/л[её]гк/.test(normN(v))?'l':'';sec='';continue}
+if(m&&/^ссылка/.test(k)){const u=v.match(/https:\/\/\S+/);e.url=u?u[0]:'';sec='';continue}
+if(m&&/^продукт/.test(k)){sec='p';continue}
+if(m&&/^шаг/.test(k)){sec='s';continue}
+if(sec=='p'){const t=l.replace(/^[-–•*]\s*/,'');let n,a,u;const p=t.split(';').map(x=>x.trim());if(p.length>=2){n=p[0];a=parseFloat((p[1]||'').replace(',','.'));u=normN(p[2]||'г')}else{const mm=t.match(/^(.+?)[\s—–-]+([\d.,]+)\s*([а-яё]*)/i);if(!mm)continue;n=mm[1];a=parseFloat(mm[2].replace(',','.'));u=normN(mm[3]||'г')}
+let un=UMAP[u]||'g';if(un=='kg'){a*=1000;un='g'}if(un=='l'){a*=1000;un='ml'}const key=similarIng(n);const it={k:key||'+',a:isFinite(a)?String(Math.round(a*100)/100):''};
+if(key){if(ING[key][1]!=un)it.w=`У продукта «${ING[key][0]}» единица — ${UN[ING[key][1]]}, проверьте количество.`}else it.nn={n:clean(n,40),u:un,p:'',c:'2'};e.ig.push(it);continue}
+if(sec=='s'){const s=clean(l.replace(/^\d+[.)]\s*/,''),300);if(s)e.st+=(e.st?'\n':'')+s}}
+return e}
+function saveED(){syncED();const e=ED,err=t=>{e.msg=t;e.force=false;myHtml()};const n=clean(e.n,60);
+if(!n)return err('Укажите название.');if(R.some(r=>r.n==n&&r.my!==e.id))return err('Блюдо с таким названием уже есть. Дайте другое название.');
+const t=Math.round(+e.t),srv=Math.round(+e.srv);if(!(t>=5&&t<=600))return err('Время — от 5 до 600 минут.');if(!(srv>=1&&srv<=20))return err('Порций — от 1 до 20.');
+let cu=e.cu;if(cu=='+'){const cn=clean(e.cun,20);if(!cn)return err('Напишите название новой кухни.');const ex=Object.entries(CN).find(([,v])=>normN(v)==normN(cn));cu=ex?ex[0]:null;if(!cu){cu=rid('xc');e._cu={k:cu,n:cn[0].toUpperCase()+cn.slice(1)}}}
+const eq=e.eq.slice();let neq=null;const en=clean(e.eqn,30);if(en&&!/^плит/i.test(en)){const ex=EQB.concat(EQX.map(x=>[x.k,x.n])).find(([,v])=>normN(v)==normN(en));if(ex){if(!eq.includes(ex[0]))eq.push(ex[0])}else{neq={k:rid('xe'),n:en[0].toUpperCase()+en.slice(1)};eq.push(neq.k)}}
+const ig=[],newIng={};for(const it of e.ig){if(!it.k&&!it.a)continue;const a=+it.a;if(!it.k)return err('Выберите продукт в каждой строке или удалите пустую строку.');if(!(a>0))return err('Укажите количество для каждого продукта.');
+let k=it.k;if(k=='+'){const nn=it.nn||{},nm=clean(nn.n,40);if(!nm)return err('Напишите название нового продукта.');const sim=similarIng(nm);if(sim)return err(`Похоже, такой продукт уже есть: «${ING[sim][0]}». Выберите его из списка.`);if(!(+nn.p>0))return err(`Укажите цену продукта «${nm}».`);
+k=rid('x');newIng[k]=[nm[0].toUpperCase()+nm.slice(1),['g','ml','шт','пуч'].includes(nn.u)?nn.u:'g',+nn.p,Math.min(4,Math.max(0,+nn.c||0)),nn.u=='шт'?1:0,null,0]}
+const u=(newIng[k]||ING[k])[1],per=a/srv;if(!e.force&&((u=='g'||u=='ml')&&per>(ING[k]&&ING[k][3]==0?800:1500)||u=='шт'&&per>10)){e.force=true;e.msg=`Проверьте количество: «${(newIng[k]||ING[k])[0]}» — ${a} ${UN[u]} на ${srv} порц., то есть ${Math.round(per)} ${UN[u]} на порцию. Если всё верно, нажмите «Сохранить всё равно».`;return myHtml()}ig.push([k,a])}
+const pc=e.pc===''?null:+e.pc;if(pc!=null&&!(pc>=0))return err('Цена порции — число.');
+if(!ig.length&&pc==null&&!e.force){e.force=true;e.msg='Без продуктов и цены порции блюдо не будет учитываться в бюджете и списке покупок. Сохранить всё равно?';return myHtml()}
+const url=String(e.url||'').trim();if(url&&!/^https:\/\/[^\s<>"']+$/.test(url))return err('Ссылка должна начинаться с https://');
+const d={id:e.id||rid('xd'),n,m:e.m=='B'?'B':'M',pr:['b','c','f','v'].includes(e.pr)?e.pr:'v',cu,t,srv,eq,keep:!!e.keep,soup:['h','l'].includes(e.soup)?e.soup:'',ig,pc:ig.length?null:pc,st:String(e.st||'').split(/\n/).map(s=>clean(s,300)).filter(Boolean).slice(0,20),url};
+const old=MY.find(x=>x.id==d.id);if(old&&old.n!=d.n){FAV=FAV.map(x=>x==old.n?d.n:x);RULES=RULES.map(x=>x.t=='r:'+old.n?{...x,t:'r:'+d.n}:x);BAN=BAN.map(x=>x==old.n?d.n:x);G.forEach(g=>{if(g.r.n==old.n)g.r={...g.r,n:d.n}})}
+Object.assign(INGX,newIng);if(e._cu)CUX.push(e._cu);if(neq)EQX.push(neq);MY=old?MY.map(x=>x.id==d.id?d:x):MY.concat(d);
+ED=null;rebuildR();buildChips({cu:e._cu?cu:(!S.cu.includes(cu)?cu:null),eq:neq?[neq.k]:[]});saveForm();read();persistMy();rulesHtml();myHtml();if(G.length){save();render()}}
+function persistMy(){LS.set('cp-ingx',INGX);LS.set('cp-cux',CUX);LS.set('cp-eqx',EQX);PS('cp-my',MY);LS.set('cp-fav',FAV);LS.set('cp-rules',RULES);LS.set('cp-ban',BAN)}
+function delMy(id){const d=MY.find(x=>x.id==id);if(!d)return;MY=MY.filter(x=>x.id!=id);FAV=FAV.filter(x=>x!=d.n);RULES=RULES.filter(x=>x.t!='r:'+d.n);BAN=BAN.filter(x=>x!=d.n);
+const uc=new Set(MY.map(x=>x.cu)),ue=new Set(MY.flatMap(x=>x.eq)),ui=new Set(MY.flatMap(x=>x.ig.map(a=>a[0])));CUX=CUX.filter(c=>uc.has(c.k));EQX=EQX.filter(x=>ue.has(x.k));for(const k in INGX)if(!ui.has(k))delete INGX[k];
+ED=null;rebuildR();buildChips();read();G.forEach(g=>{if(g.r.my==id||!R.includes(g.r)){const c=gp(g).filter(r=>r.n!=d.n);if(c.length)setR(g,c[Math.random()*c.length|0]);g.fix=false}});persistMy();rulesHtml();myHtml();bansHtml();if(G.length){save();render()}}
+const homeTotal=()=>BASE.reduce((s,[,l])=>s+l.length,0)+BASEX.length;
+function homeCnt(){const e=$('#homeCnt');if(e)e.textContent='· отмечено '+HOME.length+' из '+homeTotal()+(HOME.length?'':', отметьте перед составлением меню')}
+const normN=s=>String(s).toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ').trim();
+const matchKeys=n=>{const q=normN(n),ks=new Set();for(const k in ING){const nm=normN(ING[k][0]);if(nm==q||nm.split(/[ (,]/)[0]==q)ks.add(k)}BASE.forEach(([,l])=>l.forEach(([b,k2])=>{if(normN(b)==q)k2.forEach(k=>ks.add(k))}));return[...ks]};
+function homeHtml(){const el=$('#homeBox');if(!el)return;
+el.innerHTML='<p class="s" style="margin:0 0 6px">Отметьте, что уже есть дома в достаточном количестве. Отмеченное не попадает в список покупок. Отметки можно менять и после составления меню — список покупок пересчитается сразу.</p>'+
+BASE.map(([t,l])=>`<h3>${t}</h3>`+l.map(([n])=>`<label class="it"><input type="checkbox" data-home="${esc(n)}"${HOME.includes(n)?' checked':''}><span>${esc(n)}</span></label>`).join('')).join('')+
+'<h3>Свои продукты</h3>'+BASEX.map((x,i)=>`<div class="it"><input type="checkbox" id="hx${i}" data-home="${esc(x.n)}"${HOME.includes(x.n)?' checked':''}><label for="hx${i}" style="flex:1">${esc(x.n)}<small>${x.ks.length?'учитывается в списке покупок':'напоминание, в рецептах не встречается'}</small></label><button class="sw" data-hact="delhome" data-i="${i}" aria-label="Удалить ${esc(x.n)}">Удалить</button></div>`).join('')+
+'<div class="row" style="margin-top:8px"><div><input id="hxNew" type="text" maxlength="40" placeholder="Например: курага, мёд, сметана" aria-label="Свой продукт"></div><div style="flex:0 0 auto;min-width:0"><button class="sw" data-hact="addhome" style="min-height:42px">Добавить</button></div></div><p class="s" id="hxMsg" style="margin:6px 0 0"></p>';homeCnt()}
+function rulesHtml(){const el=$('#rulesBox');if(!el)return;
+const rn=x=>x.t.startsWith('r:')?x.t.slice(2):RT[x.t];
+el.innerHTML='<p class="s" style="margin:0 0 8px">Например: «Четверг, ужин — Плов с говядиной» или «Пятница, ужин — что-нибудь из рыбы». Правила учитываются при каждом «Составить меню»; блюда, приготовленные с запасом, переходят на следующий приём как обычно.</p>'+
+(RULES.length?RULES.map((x,i)=>`<div class="ban"><span><b>${D[x.d]}, ${MLN[x.m]}</b> — ${esc(rn(x))}</span><button class="sw" data-hact="delrule" data-i="${i}">Удалить</button></div>`).join(''):'<p class="s" style="margin:0 0 8px">Правил пока нет.</p>')+
+'<div class="row" style="margin-top:6px"><div><label class="f" for="ruD">День</label><select id="ruD">'+D.map((d,i)=>`<option value="${i}">${d}</option>`).join('')+'</select></div><div><label class="f" for="ruM">Приём</label><select id="ruM"><option value="d">Ужин</option><option value="l">Обед</option><option value="b">Завтрак</option></select></div></div>'+
+'<label class="f" for="ruT">Что готовим</label><select id="ruT"><optgroup label="Тип блюда (обед или ужин)">'+Object.entries(RT).map(([k,v])=>`<option value="${k}">${v[0].toUpperCase()+v.slice(1)}</option>`).join('')+'</optgroup><optgroup label="Обед или ужин">'+R.filter(r=>r.m=='M').map(r=>`<option value="r:${esc(r.n)}">${esc(r.n)}</option>`).join('')+'</optgroup><optgroup label="Завтрак">'+R.filter(r=>r.m=='B').map(r=>`<option value="r:${esc(r.n)}">${esc(r.n)}</option>`).join('')+'</optgroup></select>'+
+'<button class="sw" data-hact="addrule" style="margin-top:10px">Добавить правило</button><p class="s bad" id="ruMsg" style="margin:6px 0 0"></p>'+
+'<h3>Любимые блюда</h3>'+(FAV.length?'<p class="s" style="margin:0 0 6px">Попадают в меню чаще остальных.</p>'+FAV.map((n,i)=>`<div class="ban"><span><span class="pin">★</span> ${esc(n)}</span><button class="sw" data-hact="delfav" data-i="${i}">Убрать</button></div>`).join(''):'<p class="s" style="margin:0">Пока нет. В меню нажмите «Изменить» у блюда, затем «☆ В любимые».</p>')}
+function pricesHtml(){return'<section><h2>Цены продуктов</h2><p class="s" style="margin:0 0 6px">Поправка к категории, %. Нужна, если в вашем магазине цены выше или ниже.</p>'+CAT.map((c,i)=>`<div class="pr"><span>${c}</span><input type="number" step="5" value="${A[i]||0}" data-a="${i}" aria-label="Поправка: ${c}"></div>`).join('')+
+`<p class="s" style="margin:12px 0 6px">Цена за кг, литр, штуку или пучок, сум. Сезонные овощи показаны для сезона «${S.season=='w'?'зима':'лето'}».</p>`+Object.entries(ING).map(([k,v])=>`<div class="pr"><span>${v[0]}, за ${v[1]=='шт'?'штуку':v[1]=='g'?'кг':v[1]=='ml'?'литр':'пучок'}${v[5]!=null?(S.season=='w'?' (зима)':' (лето)'):''}</span><input type="number" min="0" step="500" value="${base(k)}" data-k="${k}" aria-label="Цена: ${v[0]}"></div>`).join('')+'<button class="sw" data-act="resetpr" style="margin-top:8px">Вернуть цены по умолчанию</button></section>'}
+function render(){homeCnt();HV=haveSet();if(!G.length){$('#out').innerHTML=pricesHtml();return enh()}
+const sh=shop(),apT=sh.approx.reduce((s,x)=>s+x.c,0),buyT=sh.buy.reduce((s,x)=>s+x.c,0)+apT,eat=sh.buy.reduce((s,x)=>s+x.e,0)+apT,diff=S.bud-buyT;
+const ms=G.filter(g=>g.k=='M'),n1=ms.reduce((s,g)=>s+g.s.length,0),sv=ms.reduce((s,g)=>s+(g.s.length-1)*g.r.t,0),c=cnt();
+let h=`<div class="sum"><div><b>${fm(buyT)}</b><small>закупка упаковками</small></div><div><b class="${diff>=0?'ok':'bad'}">${diff>=0?'в бюджете':'выше на '+fm(-diff)}</b><small>бюджет ${fm(S.bud)}</small></div><div><b>${fm(eat)}</b><small>съедим за неделю, остальное останется в запасе</small></div>${sv?`<div><b>${ms.length} из ${n1}</b><small>готовок обеда и ужина, экономия около ${(Math.round(sv/6)/10).toLocaleString('ru-RU')} ч</small></div>`:''}</div>`;
+if(ms.length)h+=`<p class="s" style="margin:0 0 12px">Готовок по белку: ${Object.entries(PN).filter(([k])=>c[k]).map(([k,n])=>n+' '+c[k]).join(' · ')}.</p>`;
+if(!HOME.length)h+='<div class="msg" style="margin:0 0 12px">Вы не отметили, что есть дома, поэтому список покупок посчитан как для пустого холодильника. <button class="sw" data-act="gohome">Отметить, что есть дома</button>'+(S.pref?'<br>Переключатель «Сначала готовим из того, что есть дома» пока ни на что не влияет.':'')+'</div>';
+if(S.miss&&S.miss.length)h+='<div class="msg" style="margin:0 0 12px"><b>Постоянные блюда:</b><br>'+S.miss.map(esc).join('<br>')+'</div>';
+if(diff<0&&G.some(g=>g.fix))h+='<p class="s" style="margin:0 0 12px">Постоянные блюда не заменяются при подгонке под бюджет.</p>';
+h+=todayHtml();
+D.forEach((dn,i)=>{h+=`<section class="day"><h2>${dn}</h2>${ML.map(([m,l])=>row(i,m,l)).join('')}</section>`});
+h+='<section><h2>Список покупок</h2>';
+CAT.forEach((cn,ci)=>{const l=sh.buy.filter(x=>ING[x.k][3]==ci);if(l.length)h+=`<h3>${cn}</h3>`+l.map(x=>{const pk=ING[x.k][4],left=x.b-x.q;return`<label class="it"><input type="checkbox" data-buy="${x.k}"${BOUGHT.includes(x.k)?' checked':''}><span>${ING[x.k][0]}<small>${pk==1?`нужно ${qt(x.k,x.q)}, покупаем штучно`:pk>0?`${x.n} уп. по ${qt(x.k,pk)}, нужно ${qt(x.k,x.q)}${left>=1?', останется '+qt(x.k,left):''}`:'на развес'}</small></span><b>${qt(x.k,x.b)}<br>${fm(x.c)}</b></label>`}).join('')});
+if(sh.approx.length)h+='<h3>Мои блюда без списка продуктов</h3>'+sh.approx.map(x=>`<label class="it"><input type="checkbox"><span>Продукты для «${x.n}»<small>по примерной цене порции</small></span><b>≈ ${fm(x.c)}</b></label>`).join('');
+if(sh.nop.length)h+=`<p class="s" style="margin:12px 0 0">Цена не учтена (нет продуктов и цены порции): ${sh.nop.join(', ')}.</p>`;
+if(sh.home.length)h+=`<p class="s" style="margin:12px 0 0">Есть дома, в список не вошло: ${sh.home.map(k=>ING[k][0].toLowerCase()).join(', ')}.</p>`;
+h+='<button class="go" data-act="copy" style="margin:14px 0 0">Отправить или скопировать список покупок</button></section>';
+h+=pricesHtml();$('#out').innerHTML=h;enh()}
+function bansHtml(){$('#bans').innerHTML=BAN.length?'<h3>Скрытые блюда</h3>'+BAN.map(n=>`<div class="ban"><span>${n}</span><button class="sw" data-unban="${n}">Вернуть</button></div>`).join(''):''}
+
+// ---------- сворачивание разделов ----------
+const CL=new Set(LS.get('cp-cl',['Цены продуктов','home']));
+const hk=h=>h.dataset.k||h.textContent;
+function enh(){$$('section>h2').forEach(h=>{const c=CL.has(hk(h));h.parentNode.classList.toggle('cl',c);h.tabIndex=0;h.setAttribute('role','button');h.setAttribute('aria-expanded',!c)})}
+const tg=h=>{const t=hk(h);CL.has(t)?CL.delete(t):CL.add(t);LS.set('cp-cl',[...CL].filter(x=>!/^(Сегодня|Понедельник|Вторник|Среда|Четверг|Пятница|Суббота|Воскресенье)/.test(x)));enh()};
+document.addEventListener('click',e=>{const h=e.target.closest('section>h2');if(h)tg(h)});
+document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.matches&&e.target.matches('section>h2')){e.preventDefault();tg(e.target)}});
+
+// ---------- события ----------
+$('#form').addEventListener('click',async e=>{const mb=e.target.closest('[data-mact]');if(mb){const a=mb.dataset.mact,i=+mb.dataset.i;
+if(a=='new'){ED=newED();ED.ig=[{k:'',a:''}];return myHtml()}
+if(a=='edit'){ED=edFrom(MY[i]);return myHtml()}
+if(a=='cancel'){ED=null;return myHtml()}
+if(a=='addrow'){syncED();ED.ig.push({k:'',a:''});ED.force=false;return myHtml()}
+if(a=='delrow'){syncED();ED.ig.splice(i,1);ED.force=false;return myHtml()}
+if(a=='save')return saveED();
+if(a=='del'){if(ED.confirmDel){delMy(ED.id)}else{ED.confirmDel=true;syncED();ED.msg='Нажмите «Удалить блюдо» ещё раз, чтобы удалить его насовсем.';myHtml()}return}
+if(a=='aip'){try{await navigator.clipboard.writeText(AIP.replace(/\\n/g,'\n'));mb.textContent='Скопировано — вставьте в Claude или ChatGPT'}catch(_){$('#impMsg').textContent='Не удалось скопировать. Шаблон: '+TPL}return}
+if(a=='parse'){const t=$('#eImp').value;if(!/Название\s*:/i.test(t))return $('#impMsg').textContent='Не нашёл строку «Название:». Вставьте ответ ИИ целиком.';ED=parseTpl(t);if(!ED.ig.length)ED.ig=[{k:'',a:''}];ED.msg=ED.ig.some(x=>x.k=='+')?'Проверьте поля. Для новых продуктов укажите цену.':'Проверьте поля и нажмите «Сохранить».';myHtml();$('#eN')&&$('#eN').scrollIntoView({behavior:'smooth',block:'center'});return}
+return}
+const b=e.target.closest('[data-hact]');if(!b)return;const a=b.dataset.hact,i=+b.dataset.i;
+if(a=='addhome'){const v=$('#hxNew').value.trim().replace(/\s+/g,' ');const m=t=>{$('#hxMsg').textContent=t};if(!v)return m('Введите название продукта.');
+if(BASEX.some(x=>normN(x.n)==normN(v))||BASE.some(([,l])=>l.some(([n])=>normN(n)==normN(v))))return m('Такой пункт уже есть в списке.');
+BASEX.push({n:v.slice(0,40),ks:matchKeys(v)});PS('cp-basex',BASEX);homeHtml();if(G.length)render();return}
+if(a=='delhome'){const x=BASEX[i];if(!x)return;BASEX.splice(i,1);HOME=HOME.filter(n=>n!=x.n);LS.set('cp-home',HOME);PS('cp-basex',BASEX);homeHtml();if(G.length)render();return}
+if(a=='addrule'){const x={d:+$('#ruD').value,m:$('#ruM').value,t:$('#ruT').value};
+if(x.m=='b'&&x.t in RT)return $('#ruMsg').textContent='Тип блюда задаётся только для обеда и ужина. Для завтрака выберите конкретное блюдо.';
+const r=x.t.startsWith('r:')?R.find(r=>r.n==x.t.slice(2)):null;if(r&&(r.m=='B')!=(x.m=='b'))return $('#ruMsg').textContent=r.n+(r.m=='B'?' — это завтрак.':' — это блюдо для обеда или ужина.');
+RULES=RULES.filter(y=>!(y.d==x.d&&y.m==x.m)).concat(x).sort((a,b)=>a.d-b.d||'bld'.indexOf(a.m)-'bld'.indexOf(b.m));PS('cp-rules',RULES);rulesHtml();return}
+if(a=='delrule'){RULES.splice(i,1);PS('cp-rules',RULES);rulesHtml();return}
+if(a=='delfav'){FAV.splice(i,1);PS('cp-fav',FAV);rulesHtml();if(G.length)render();return}});
+$('#form').addEventListener('change',e=>{const t=e.target;if(t.closest&&t.closest('.ed')){if(t.matches('.ri,.nnu,#eC,#eS')){syncED();if(t.matches('.ri')){const r=t.closest('.irow'),i=$$('.irow').indexOf(r);if(ED.ig[i])ED.ig[i].w=''}ED.force=false;myHtml()}return}if(t.dataset&&t.dataset.home!=null){HOME=t.checked?[...new Set(HOME.concat(t.dataset.home))]:HOME.filter(n=>n!=t.dataset.home);PS('cp-home',HOME);homeCnt();if(G.length)render();return}
+if(!t.name)return;saveForm();if(e.target.name=='season'&&G.length){read();render()}});
+$('#form').addEventListener('input',e=>{if(e.target.closest&&e.target.closest('.ed'))return;saveForm()});
+$('#go').onclick=()=>{saveForm();gen();$('#out').scrollIntoView({behavior:'smooth'})};
+$('#bans').addEventListener('click',e=>{const b=e.target.closest('[data-unban]');if(!b)return;BAN=BAN.filter(n=>n!=b.dataset.unban);PS('cp-ban',BAN);bansHtml()});
+$('#out').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+if(a=='copy'){const sh=shop(),t=CAT.map((n,ci)=>{const l=sh.buy.filter(x=>ING[x.k][3]==ci);return l.length?n+':\n'+l.map(x=>'- '+ING[x.k][0]+', '+(ING[x.k][4]>1?x.n+' уп. по '+qt(x.k,ING[x.k][4]):qt(x.k,x.b))).join('\n'):''}).filter(Boolean).join('\n\n');if(navigator.share){navigator.share({title:'Список покупок',text:t}).catch(()=>{});return}try{navigator.clipboard.writeText(t).then(()=>b.textContent='Скопировано',()=>b.textContent='Не удалось скопировать')}catch(_){b.textContent='Не удалось скопировать'}return}
+if(a=='gohome'){CL.delete('home');LS.set('cp-cl',[...CL]);enh();$('#homeSec').scrollIntoView({behavior:'smooth'});return}
+if(a=='resetpr'){PR={};A=[0,0,0,0,0];PS('cp-pr',PR);PS('cp-adj',A);return render()}
+const box=b.closest('[data-d]'),d=+box.dataset.d,m=box.dataset.m,k=d+'-'+m,g=slotG(d,m);if(!g)return;
+if(a=='open'){op=op==k?'':k;return render()}
+if(a=='close'){op='';return render()}
+if(a=='lock'){g.lock=!g.lock}
+else if(a=='fav'){FAV=FAV.includes(g.r.n)?FAV.filter(n=>n!=g.r.n):FAV.concat(g.r.n);PS('cp-fav',FAV);rulesHtml()}
+else if(a=='rnd'){const us=G.map(x=>x.r.id),c=gp(g).filter(r=>r.id!=g.r.id),u=c.filter(r=>!us.includes(r.id)),l=u.length?u:c;if(l.length)setR(g,l[Math.random()*l.length|0])}
+else if(a=='pick'){setR(g,R[+b.dataset.r]);g.fix=false;op=''}
+else if(a=='ban'){BAN.push(g.r.n);PS('cp-ban',BAN);bansHtml();g.lock=false;const c=gp(g);if(c.length)setR(g,c[Math.random()*c.length|0]);op=''}
+save();render()});
+$('#out').addEventListener('change',e=>{const t=e.target;
+if(t.dataset.buy){BOUGHT=t.checked?[...new Set(BOUGHT.concat(t.dataset.buy))]:BOUGHT.filter(k=>k!=t.dataset.buy);PS('cp-bought',BOUGHT);const y=scrollY;render();scrollTo(0,y);return}
+if(t.dataset.home!=null){HOME=t.checked?[...new Set(HOME.concat(t.dataset.home))]:HOME.filter(n=>n!=t.dataset.home);PS('cp-home',HOME);return G.length&&render()}
+if(t.dataset.a!=null){A[+t.dataset.a]=+t.value||0;PS('cp-adj',A);return render()}
+if(t.dataset.k){PR[pkey(t.dataset.k)]=+t.value||0;PS('cp-pr',PR);return render()}});
+
+// ---------- старт ----------
+const f0=LS.get('cp-form',null);if(f0)formSet(f0);
+read();bansHtml();rulesHtml();homeHtml();myHtml();
+try{const q=new URLSearchParams(location.search);if(q.has('share')){const txt=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' '),u=(txt.match(/https:\/\/\S+/)||[''])[0];ED=newED();ED.ig=[{k:'',a:''}];ED.url=u;ED.n=clean((q.get('title')||'').replace(/https:\/\/\S+/g,''),60);ED.msg='Рецепт из «Поделиться»: дайте название и сохраните. Продукты можно указать сейчас или позже.';CL.delete('my');myHtml();history.replaceState(null,'',location.pathname);setTimeout(()=>{const x=$('#myBox');if(x)x.scrollIntoView()},300)}}catch(_){}
+if(load())render();else render();
+startPoll();moveHtml();
+$('#moveBox').addEventListener('click',async e=>{const t=e.target;
+if(t.id=='mvGo'){location.href=moveLink();return}
+if(t.id=='mvCopy'){try{await navigator.clipboard.writeText(moveLink());$('#mvMsg').textContent='Ссылка скопирована. Вставьте её в новом приложении: «Общее меню семьи» → «Есть ссылка-приглашение?».'}catch(_){$('#mvMsg').textContent='Не удалось скопировать.'}return}
+if(t.id=='mvNo'){MOVE=null;moveHtml();return}
+if(t.id=='mvDo'){t.disabled=true;const r=await doMove(MOVE);MOVE=null;moveHtml();setSync(r||(CFG?OK:'Данные перенесены на этот адрес.'),!r&&!!CFG);famHtml()}});
+$('#famSec').addEventListener('click',async e=>{const t=e.target,msg=m=>{const x=$('#fMsg');if(x)x.textContent=m};
+if(t.id=='fCopySql'){try{await navigator.clipboard.writeText($('#sql').textContent);t.textContent='Скопировано'}catch(_){t.textContent='Выделите текст и скопируйте вручную'}}
+if(t.id=='fClip'){try{const x=await navigator.clipboard.readText();$('#fInvUrl').value=x;msg('')}catch(_){msg('Не удалось прочитать буфер. Нажмите в поле и выберите «Вставить».')}return}
+if(t.id=='fCopyInv'){try{await navigator.clipboard.writeText(inviteLink());t.textContent='Скопировано'}catch(_){msg('Ссылка: '+inviteLink())}return}
+if(t.id=='fPaste'){const mv=String($('#fInvUrl').value||'').match(/#move=([A-Za-z0-9_-]+)/);if(mv){let d=null;try{d=JSON.parse(b64d(mv[1]))}catch(_){}t.disabled=true;msg('Переношу данные…');const r=d?await doMove(d):'Ссылка переноса повреждена.';t.disabled=false;msg(r||'Данные перенесены.');famHtml();return}
+const m=String($('#fInvUrl').value||'').match(/#join=([A-Za-z0-9_-]+)/);let j=null;try{if(m)j=JSON.parse(b64d(m[1]))}catch(_){}
+if(!j||typeof j.u!='string'||typeof j.k!='string')return msg('Это не похоже на ссылку-приглашение. Скопируйте ссылку из чата целиком.');
+t.disabled=true;msg('Проверяю подключение…');const r=await connect(j.u,j.k,j.f);t.disabled=false;if(r)msg(r);else famHtml();return}
+if(t.id=='fCon'||t.id=='fJoin'){t.disabled=true;msg('Проверяю подключение…');const r=t.id=='fJoin'?await connect(JOIN.u,JOIN.k,JOIN.f):await connect($('#fUrl').value,$('#fKey').value);if(t.id=='fJoin'&&!r)JOIN=null;t.disabled=false;if(r){msg(r)}else{famHtml()}}
+if(t.id=='fInv'){const l=inviteLink();try{if(navigator.share){await navigator.share({title:'Общее меню семьи',text:'Подключись к нашему общему меню на неделю. Android: открой ссылку в Chrome и нажми «Подключиться». iPhone: открой ссылку в Safari, установи приложение («Поделиться» → «На экран «Домой»»), открой его со значка и вставь эту ссылку в поле «Есть ссылка-приглашение?».',url:l});return}await navigator.clipboard.writeText(l);msg('Ссылка скопирована, вставьте её в чат с семьёй.')}catch(_){msg('Ссылка: '+l)}}
+if(t.id=='fOff'){CFG=null;LS.set('cp-sb',null);clearInterval(pollT);setSync(LOCAL);famHtml()}});
+// ---------- установка как приложение ----------
+let instEv=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instBtn');if(b)b.hidden=false});
+$('#instBtn').onclick=async()=>{if(!instEv)return;instEv.prompt();await instEv.userChoice;instEv=null;$('#instBtn').hidden=true};
+if(STANDALONE){$('#instDone').hidden=false}
+if('serviceWorker' in navigator&&location.protocol=='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script></body></html>
