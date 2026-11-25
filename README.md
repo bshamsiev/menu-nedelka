@@ -15,17 +15,17 @@
 | `supabase.sql` | код таблицы для общего меню семьи (тот же, что в инструкции внутри приложения) |
 
 ## Где размещён сайт
-Основной адрес: **https://bshamsiev.github.io/menu/** (GitHub Pages, бесплатно, без лимита на число обновлений).
+Основной адрес: **https://bshamsiev.github.io/menu-nedelka/** (GitHub Pages, бесплатно, без лимита на число обновлений).
 Старый адрес https://menu-nedelka.netlify.app показывает плашку «Приложение переехало» с кнопкой «Перенести мои данные» (плашка включается автоматически на любом адресе *.netlify.app).
 
 ### Первая публикация на GitHub Pages
-1. github.com → **+** → New repository → имя `menu` → **Public** → Create repository.
+1. github.com → **+** → New repository → имя `menu-nedelka` → **Public** → Create repository.
 2. В новом репозитории: **uploading an existing file** (или Add file → Upload files) → перетащите все файлы из архива **и папку `icons`** → Commit changes.
 3. Settings → Pages → Source: **Deploy from a branch**, Branch: **main**, папка **/ (root)** → Save.
-4. Через 1–2 минуты сайт откроется по адресу https://bshamsiev.github.io/menu/
+4. Через 1–2 минуты сайт откроется по адресу https://bshamsiev.github.io/menu-nedelka/
 
 ### Как обновлять
-Репозиторий `menu` → Add file → Upload files → перетащите новые файлы (с заменой) → Commit changes. Через минуту обновится сайт. Номер версии в `sw.js` уже увеличен в каждом новом архиве.
+Репозиторий `menu-nedelka` → Add file → Upload files → перетащите новые файлы (с заменой) → Commit changes. Через минуту обновится сайт. Номер версии в `sw.js` уже увеличен в каждом новом архиве.
 
 ## Как установить на телефон
 - **iPhone:** открыть сайт в Safari → «Поделиться» (квадрат со стрелкой; в компактном виде Safari — «•••» рядом с адресом) → «На экран «Домой»» → «Добавить».

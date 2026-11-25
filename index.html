@@ -66,9 +66,11 @@ ol.guide{padding-left:20px;margin:6px 0}ol.guide li{margin:0 0 10px}.warn{border
 .irow{display:grid;grid-template-columns:minmax(0,1fr) 84px auto;gap:6px;align-items:center;margin:6px 0}.irow .u{font-size:13px;color:var(--mu)}.nn{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;padding:8px;border:1px dashed var(--bd);border-radius:8px}
 textarea{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);min-height:90px}.ed{border:1px solid var(--ac);border-radius:10px;padding:12px;margin:10px 0}.tag{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);color:var(--mu);white-space:nowrap}
 .buy{color:#b5651d;font-weight:500}:root[data-theme=dark] .buy{color:#f0b550}@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .buy{color:#f0b550}}
+.fnb{min-height:28px;margin:0}.fnb .fn{font:600 18px/1.3 system-ui,-apple-system,sans-serif;color:var(--ac);background:none;border:0;padding:4px 0;cursor:pointer;text-align:left}.fnb .fn small{font-weight:400;color:var(--mu);margin-left:6px}.fnb .add{font-size:14px;color:var(--mu);background:none;border:0;padding:4px 0;cursor:pointer}.fnb .ed2{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.fnb .ed2 input{max-width:280px}
 .lf{font-weight:500;color:var(--ac)}.pin{font-weight:600;color:var(--ac2)}
 .ban{display:flex;gap:8px;align-items:center;padding:4px 0}.ban span{flex:1}
 </style></head><body><main>
+<div id="fnBox" class="fnb"></div>
 <h1>Что приготовить?</h1>
 <p class="s" style="margin-bottom:6px">Ответьте на несколько вопросов и получите меню на неделю со списком покупок и стоимостью в сумах.</p>
 <div id="moveBox"></div>
@@ -146,6 +148,7 @@ const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.par
 let PR=LS.get('cp-pr',{}),A=LS.get('cp-adj',[0,0,0,0,0]),BAN=LS.get('cp-ban',[]),HOME=LS.get('cp-home',[]);
 let S={},G=[],op='',sdi=0;
 let RULES=LS.get('cp-rules',[]),FAV=LS.get('cp-fav',[]),BASEX=LS.get('cp-basex',[]);
+let FNAME=LS.get('cp-fname',''),FEDIT=false;
 let MY=LS.get('cp-my',[]),INGX=LS.get('cp-ingx',{}),CUX=LS.get('cp-cux',[]),EQX=LS.get('cp-eqx',[]),ED=null;
 const RB=R.length,CNB={...CN},EQB=[['o','Духовка'],['m','Мультиварка'],['b','Блендер или смузимейкер'],['w','Микроволновка']];
 const DISB=[['onion','Лук'],['carrot','Морковь'],['tomato','Помидоры'],['cabbage','Капуста'],['pepper','Перец'],['milk','Молоко'],['fish','Рыба'],['garlic','Чеснок'],['greens','Зелень'],['spice','Специи']];
@@ -177,7 +180,7 @@ if(r.status==540||r.status==503)return'Проект Supabase приостано�
 return'Ошибка сервера '+r.status+'.'}
 function sync(){if(!CFG)return;pend=true;clearTimeout(wT);wT=setTimeout(push,800)}
 async function push(){if(!CFG)return;if(writing){again=true;return}writing=true;
-const b={v:1,at:Date.now(),tab:TAB,form:formGet(),plan:planOut(),home:HOME,ban:BAN,pr:PR,adj:A,bought:BOUGHT,rules:RULES,fav:FAV,basex:BASEX,my:MY,ingx:INGX,cux:CUX,eqx:EQX};
+const b={v:1,at:Date.now(),tab:TAB,form:formGet(),plan:planOut(),home:HOME,ban:BAN,pr:PR,adj:A,bought:BOUGHT,rules:RULES,fav:FAV,basex:BASEX,my:MY,ingx:INGX,cux:CUX,eqx:EQX,fname:FNAME};
 try{const r=await api(CFG,'?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:CFG.fam,data:b,updated_at:new Date(b.at).toISOString()})});
 if(!r.ok)throw new Error(await errText(r));lastSeen=b.at;setSync(OK,true)}
 catch(e){setSync('Не сохранилось в общее меню: '+(e&&e.name=='TypeError'?'нет связи.':e.message)+' Повторю при следующем изменении.')}
@@ -194,7 +197,7 @@ addEventListener('online',()=>{if(CFG)pull()});
 const jwtRole=k=>{try{return JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role}catch(e){return''}};
 const b64e=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const b64d=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
-const inviteLink=()=>location.origin+location.pathname+'#join='+b64e(JSON.stringify({u:CFG.url,k:CFG.key,f:CFG.fam}));
+const inviteLink=()=>location.origin+location.pathname+'#join='+b64e(JSON.stringify({u:CFG.url,k:CFG.key,f:CFG.fam,n:FNAME||undefined}));
 async function connect(url,key,fam){url=String(url||'').trim().replace(/\/+$/,'').replace(/\/rest\/v1$/,'');key=String(key||'').trim();
 if(!/^https:\/\/[^\s/?#]+$/.test(url))return'Адрес проекта должен выглядеть так: https://abcd1234.supabase.co';
 if(!key)return'Вставьте publishable key.';
@@ -209,13 +212,14 @@ function famHtml(){const el=$('#famBox');if(!el)return;
 if(CFG){el.innerHTML='<p class="ok" style="margin:0 0 8px">Подключено к общему меню семьи.</p><p class="s" style="margin:0 0 8px">Отправьте ссылку-приглашение членам семьи, например в Telegram. Открыв её на телефоне, они сразу подключатся к этому же меню. Ссылка работает как ключ: не публикуйте её в открытых чатах.</p><div class="acts2"><button class="sw" id="fInv">Отправить приглашение</button>'+(IOS&&!STANDALONE?'<button class="sw" id="fCopyInv">Скопировать ссылку-приглашение</button>':'')+'<button class="sw" id="fOff">Отключить на этом телефоне</button></div>'+(IOS&&!STANDALONE?IOSNOTE:'')+'<p class="s" id="fMsg" style="margin:8px 0 0"></p>';return}
 const paste='<label class="f" for="fInvUrl" style="margin-top:0"><b>Есть ссылка-приглашение от семьи?</b> Скопируйте её из чата и вставьте сюда</label><input id="fInvUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://…#join=…"><div class="acts2" style="margin-top:10px"><button class="sw" id="fClip">Вставить из буфера</button></div><button class="go" id="fPaste" style="margin:10px 0 0">Подключиться по приглашению</button>';
 const manual='<h3 style="margin:18px 0 0">Или настройте общее меню сами (по инструкции ниже)</h3><label class="f" for="fUrl">Адрес проекта (Project URL)</label><input id="fUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://abcd1234.supabase.co"><label class="f" for="fKey">Publishable key</label><input id="fKey" type="text" autocomplete="off" placeholder="sb_publishable_..."><button class="go" id="fCon" style="margin:12px 0 0">Подключить</button>';
-el.innerHTML=JOIN?'<div class="join"><p style="margin:0 0 8px"><b>Вас пригласили в общее меню семьи.</b> После подключения меню на этом телефоне заменится общим.</p><button class="go" id="fJoin" style="margin:0">Подключиться</button></div><p class="s bad" id="fMsg" style="margin:0 0 8px"></p><details><summary>Другие способы подключения</summary>'+paste+manual+'</details>':paste+manual+'<p class="s bad" id="fMsg" style="margin:8px 0 0"></p>'}
-const NEWURL='https://bshamsiev.github.io/menu/',OLDHOST=/netlify\.app$/i.test(location.hostname);
-const moveData=()=>({v:1,at:Date.now(),tab:'move',form:formGet(),plan:planOut(),home:HOME,ban:BAN,pr:PR,adj:A,bought:BOUGHT,rules:RULES,fav:FAV,basex:BASEX,my:MY,ingx:INGX,cux:CUX,eqx:EQX,sb:CFG});
+el.innerHTML=JOIN?'<div class="join"><p style="margin:0 0 8px"><b>Вас пригласили в общее меню'+(JOIN&&typeof JOIN.n=='string'&&clean(JOIN.n,40)?' «'+esc(clean(JOIN.n,40))+'»':' семьи')+'.</b> После подключения меню на этом телефоне заменится общим.</p><button class="go" id="fJoin" style="margin:0">Подключиться</button></div><p class="s bad" id="fMsg" style="margin:0 0 8px"></p><details><summary>Другие способы подключения</summary>'+paste+manual+'</details>':paste+manual+'<p class="s bad" id="fMsg" style="margin:8px 0 0"></p>'}
+const NEWURL='https://bshamsiev.github.io/menu-nedelka/',OLDHOST=/netlify\.app$/i.test(location.hostname);
+const moveData=()=>({v:1,at:Date.now(),tab:'move',form:formGet(),plan:planOut(),home:HOME,ban:BAN,pr:PR,adj:A,bought:BOUGHT,rules:RULES,fav:FAV,basex:BASEX,my:MY,ingx:INGX,cux:CUX,eqx:EQX,fname:FNAME,sb:CFG});
 const moveLink=()=>NEWURL+'#move='+b64e(JSON.stringify(moveData()));
 let MOVE=null;
 function moveHtml(){const el=$('#moveBox');if(!el)return;
 if(MOVE){el.innerHTML='<div class="join"><p style="margin:0 0 8px"><b>Перенос данных со старого адреса.</b> Анкета, меню, свои блюда, правила, цены и подключение к общему меню семьи будут перенесены на этот адрес. Данные, которые уже есть здесь, заменятся.</p><button class="go" id="mvDo" style="margin:0">Перенести</button><button class="sw" id="mvNo" style="margin-top:8px">Не переносить</button></div>';return}
+if(OLDHOST&&IOS){el.innerHTML='<div class="join"><p style="margin:0 0 8px"><b>Приложение переехало на новый адрес:</b> '+NEWURL.replace('https://','')+'. Здесь оно больше не будет обновляться. Перенесите данные в три шага:</p><ol class="guide" style="margin:0 0 8px"><li>Скопируйте адрес нового сайта, откройте его в <b>Safari</b> → «Поделиться» → «На экран «Домой»».<br><button class="sw" id="mvUrl" style="margin-top:6px">Скопировать адрес нового сайта</button></li><li>Вернитесь сюда и скопируйте ссылку переноса.<br><button class="go" id="mvCopy" style="margin:6px 0 0">Скопировать ссылку переноса</button></li><li>Откройте новое приложение со значка → «Общее меню семьи» → поле «Есть ссылка-приглашение?» → «Вставить из буфера» → «Подключиться по приглашению». Старый значок после этого удалите.</li></ol><p class="s" id="mvMsg" style="margin:6px 0 0"></p></div>';return}
 if(OLDHOST){el.innerHTML='<div class="join"><p style="margin:0 0 8px"><b>Приложение переехало на новый адрес:</b> <a href="'+NEWURL+'">'+NEWURL.replace('https://','')+'</a>. Здесь оно больше не будет обновляться.</p><p class="s" style="margin:0 0 8px">Нажмите «Перенести мои данные» — откроется новый адрес со всеми вашими данными. Затем установите его на экран «Домой», а старый значок удалите.</p><button class="go" id="mvGo" style="margin:0">Перенести мои данные</button><p class="s" style="margin:8px 0 4px"><b>iPhone, если новое приложение уже установлено на экран «Домой»:</b> скопируйте ссылку переноса и вставьте её в новом приложении в поле «Есть ссылка-приглашение?».</p><button class="sw" id="mvCopy">Скопировать ссылку переноса</button><p class="s" id="mvMsg" style="margin:6px 0 0"></p></div>';return}
 el.innerHTML=''}
 async function doMove(d){if(!d||typeof d!='object')return'Ссылка переноса повреждена.';applyRemote({...d,tab:'move'});saveForm();
@@ -224,6 +228,7 @@ return''}
 try{const m=location.hash.match(/^#move=([A-Za-z0-9_-]+)$/);if(m){MOVE=JSON.parse(b64d(m[1]));history.replaceState(null,'',location.pathname+location.search)}}catch(e){MOVE=null}
 let JOIN=null;try{const m=location.hash.match(/^#join=([A-Za-z0-9_-]+)$/);if(m){const j=JSON.parse(b64d(m[1]));if(j&&typeof j.u=='string'&&typeof j.k=='string')JOIN=j;history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
 function applyRemote(d){if(!d||typeof d!='object')return;
+if(typeof d.fname=='string'){FNAME=clean(d.fname,40);LS.set('cp-fname',FNAME);fnHtml()}
 const sm=sanMy(d);INGX=sm.ingx;CUX=sm.cux;EQX=sm.eqx;MY=sm.my;LS.set('cp-ingx',INGX);LS.set('cp-cux',CUX);LS.set('cp-eqx',EQX);LS.set('cp-my',MY);rebuildR();buildChips();
 const names=new Set(R.map(r=>r.n)),labels=new Set(BASE.flatMap(([,l])=>l.map(([n])=>n))),arr=(x,ok)=>Array.isArray(x)?x.filter(ok):[];
 if(d.form&&typeof d.form=='object'){formSet(d.form);LS.set('cp-form',formGet())}
@@ -341,6 +346,11 @@ const row=(d,m,l)=>{const g=slotG(d,m);if(!g)return'';const k=d+'-'+m;return`<di
 function todayHtml(){const t=(new Date().getDay()+6)%7,rows=ML.map(([m,l])=>row(t,m,l)).join('');if(!rows)return'';
 const cook=G.filter(g=>g.s[0][0]==t),tom=G.filter(g=>g.s.length>1&&g.s[0][0]==t);
 return`<section class="today"><h2>Сегодня, ${D[t].toLowerCase()}</h2>${cook.length?`<p class="s" style="margin:0 0 6px">Готовим сегодня: ${cook.map(g=>g.r.n).join(', ')}.${tom.length?' Часть оставьте на следующий приём.':''}</p>`:'<p class="s" style="margin:0 0 6px">Сегодня ничего не готовим, едим остатки.</p>'}${rows}</section>`}
+// ---------- название семьи ----------
+function fnHtml(){const el=$('#fnBox');if(!el)return;
+if(FEDIT){el.innerHTML='<div class="ed2"><input id="fnIn" type="text" maxlength="40" placeholder="Например: Семья Шамсиевых" value="'+esc(FNAME)+'" aria-label="Название семьи"><button class="sw" data-fn="save">Сохранить</button><button class="sw" data-fn="cancel">Отмена</button></div>';const i=$('#fnIn');if(i)i.focus();return}
+el.innerHTML=FNAME?'<button class="fn" data-fn="edit" aria-label="Изменить название семьи">'+esc(FNAME)+'<small>✎</small></button>':'<button class="add" data-fn="edit">+ Название семьи</button>';
+document.title=FNAME?FNAME+' — что приготовить?':'Что приготовить?'}
 // ---------- мои блюда ----------
 function sanMy(d){const ok=(re,s)=>typeof s=='string'&&re.test(s),num=(v,a,b)=>typeof v=='number'&&isFinite(v)&&v>=a&&v<=b;
 const ingx={};if(d.ingx&&typeof d.ingx=='object')for(const k in d.ingx){const v=d.ingx[k];if(ok(/^x[a-z0-9]{4,12}$/,k)&&Array.isArray(v)&&clean(v[0],40)&&['g','ml','шт','пуч'].includes(v[1])&&num(v[2],0,1e8)&&[0,1,2,3,4].includes(v[3]))ingx[k]=[clean(v[0],40),v[1],v[2],v[3],v[1]=='шт'?1:0,null,0]}
@@ -510,7 +520,7 @@ $('#form').addEventListener('input',e=>{if(e.target.closest&&e.target.closest('.
 $('#go').onclick=()=>{saveForm();gen();$('#out').scrollIntoView({behavior:'smooth'})};
 $('#bans').addEventListener('click',e=>{const b=e.target.closest('[data-unban]');if(!b)return;BAN=BAN.filter(n=>n!=b.dataset.unban);PS('cp-ban',BAN);bansHtml()});
 $('#out').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
-if(a=='copy'){const sh=shop(),t=CAT.map((n,ci)=>{const l=sh.buy.filter(x=>ING[x.k][3]==ci);return l.length?n+':\n'+l.map(x=>'- '+ING[x.k][0]+', '+(ING[x.k][4]>1?x.n+' уп. по '+qt(x.k,ING[x.k][4]):qt(x.k,x.b))).join('\n'):''}).filter(Boolean).join('\n\n');if(navigator.share){navigator.share({title:'Список покупок',text:t}).catch(()=>{});return}try{navigator.clipboard.writeText(t).then(()=>b.textContent='Скопировано',()=>b.textContent='Не удалось скопировать')}catch(_){b.textContent='Не удалось скопировать'}return}
+if(a=='copy'){const sh=shop(),t=CAT.map((n,ci)=>{const l=sh.buy.filter(x=>ING[x.k][3]==ci);return l.length?n+':\n'+l.map(x=>'- '+ING[x.k][0]+', '+(ING[x.k][4]>1?x.n+' уп. по '+qt(x.k,ING[x.k][4]):qt(x.k,x.b))).join('\n'):''}).filter(Boolean).join('\n\n');if(navigator.share){navigator.share({title:'Список покупок'+(FNAME?' — '+FNAME:''),text:(FNAME?FNAME+'. ':'')+'Список покупок\n\n'+t}).catch(()=>{});return}try{navigator.clipboard.writeText(t).then(()=>b.textContent='Скопировано',()=>b.textContent='Не удалось скопировать')}catch(_){b.textContent='Не удалось скопировать'}return}
 if(a=='gohome'){CL.delete('home');LS.set('cp-cl',[...CL]);enh();$('#homeSec').scrollIntoView({behavior:'smooth'});return}
 if(a=='resetpr'){PR={};A=[0,0,0,0,0];PS('cp-pr',PR);PS('cp-adj',A);return render()}
 const box=b.closest('[data-d]'),d=+box.dataset.d,m=box.dataset.m,k=d+'-'+m,g=slotG(d,m);if(!g)return;
@@ -533,10 +543,15 @@ const f0=LS.get('cp-form',null);if(f0)formSet(f0);
 read();bansHtml();rulesHtml();homeHtml();myHtml();
 try{const q=new URLSearchParams(location.search);if(q.has('share')){const txt=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' '),u=(txt.match(/https:\/\/\S+/)||[''])[0];ED=newED();ED.ig=[{k:'',a:''}];ED.url=u;ED.n=clean((q.get('title')||'').replace(/https:\/\/\S+/g,''),60);ED.msg='Рецепт из «Поделиться»: дайте название и сохраните. Продукты можно указать сейчас или позже.';CL.delete('my');myHtml();history.replaceState(null,'',location.pathname);setTimeout(()=>{const x=$('#myBox');if(x)x.scrollIntoView()},300)}}catch(_){}
 if(load())render();else render();
-startPoll();moveHtml();
+startPoll();moveHtml();fnHtml();
+$('#fnBox').addEventListener('click',e=>{const b=e.target.closest('[data-fn]');if(!b)return;const a=b.dataset.fn;
+if(a=='edit'){FEDIT=true;return fnHtml()}if(a=='cancel'){FEDIT=false;return fnHtml()}
+if(a=='save'){FNAME=clean($('#fnIn').value,40);FEDIT=false;PS('cp-fname',FNAME);fnHtml()}});
+$('#fnBox').addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.id=='fnIn'){e.preventDefault();$('[data-fn=save]').click()}if(e.key=='Escape'){FEDIT=false;fnHtml()}});
 $('#moveBox').addEventListener('click',async e=>{const t=e.target;
 if(t.id=='mvGo'){location.href=moveLink();return}
 if(t.id=='mvCopy'){try{await navigator.clipboard.writeText(moveLink());$('#mvMsg').textContent='Ссылка скопирована. Вставьте её в новом приложении: «Общее меню семьи» → «Есть ссылка-приглашение?».'}catch(_){$('#mvMsg').textContent='Не удалось скопировать.'}return}
+if(t.id=='mvUrl'){try{await navigator.clipboard.writeText(NEWURL);$('#mvMsg').textContent='Адрес скопирован. Откройте Safari и вставьте его в адресную строку.'}catch(_){$('#mvMsg').textContent='Адрес: '+NEWURL}return}
 if(t.id=='mvNo'){MOVE=null;moveHtml();return}
 if(t.id=='mvDo'){t.disabled=true;const r=await doMove(MOVE);MOVE=null;moveHtml();setSync(r||(CFG?OK:'Данные перенесены на этот адрес.'),!r&&!!CFG);famHtml()}});
 $('#famSec').addEventListener('click',async e=>{const t=e.target,msg=m=>{const x=$('#fMsg');if(x)x.textContent=m};
@@ -548,7 +563,7 @@ const m=String($('#fInvUrl').value||'').match(/#join=([A-Za-z0-9_-]+)/);let j=nu
 if(!j||typeof j.u!='string'||typeof j.k!='string')return msg('Это не похоже на ссылку-приглашение. Скопируйте ссылку из чата целиком.');
 t.disabled=true;msg('Проверяю подключение…');const r=await connect(j.u,j.k,j.f);t.disabled=false;if(r)msg(r);else famHtml();return}
 if(t.id=='fCon'||t.id=='fJoin'){t.disabled=true;msg('Проверяю подключение…');const r=t.id=='fJoin'?await connect(JOIN.u,JOIN.k,JOIN.f):await connect($('#fUrl').value,$('#fKey').value);if(t.id=='fJoin'&&!r)JOIN=null;t.disabled=false;if(r){msg(r)}else{famHtml()}}
-if(t.id=='fInv'){const l=inviteLink();try{if(navigator.share){await navigator.share({title:'Общее меню семьи',text:'Подключись к нашему общему меню на неделю. Android: открой ссылку в Chrome и нажми «Подключиться». iPhone: открой ссылку в Safari, установи приложение («Поделиться» → «На экран «Домой»»), открой его со значка и вставь эту ссылку в поле «Есть ссылка-приглашение?».',url:l});return}await navigator.clipboard.writeText(l);msg('Ссылка скопирована, вставьте её в чат с семьёй.')}catch(_){msg('Ссылка: '+l)}}
+if(t.id=='fInv'){const l=inviteLink();try{if(navigator.share){await navigator.share({title:'Общее меню семьи',text:'Подключись к нашему общему меню на неделю'+(FNAME?' ('+FNAME+')':'')+'. Android: открой ссылку в Chrome и нажми «Подключиться». iPhone: открой ссылку в Safari, установи приложение («Поделиться» → «На экран «Домой»»), открой его со значка и вставь эту ссылку в поле «Есть ссылка-приглашение?».',url:l});return}await navigator.clipboard.writeText(l);msg('Ссылка скопирована, вставьте её в чат с семьёй.')}catch(_){msg('Ссылка: '+l)}}
 if(t.id=='fOff'){CFG=null;LS.set('cp-sb',null);clearInterval(pollT);setSync(LOCAL);famHtml()}});
 // ---------- установка как приложение ----------
 let instEv=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instBtn');if(b)b.hidden=false});
