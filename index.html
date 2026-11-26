@@ -145,11 +145,10 @@ end $$;</pre><button class="sw" id="fCopySql">Скопировать код</but
 <button class="go" id="instBtn" hidden style="margin:0 0 10px">Установить приложение</button>
 <p style="margin:0 0 6px"><b>iPhone:</b> откройте сайт в Safari → кнопка «Поделиться» (квадрат со стрелкой; в компактном виде — «•••» рядом с адресом) → «На экран «Домой»» → «Добавить». Если вы подключались к общему меню в Safari, откройте приложение со значка и вставьте ссылку-приглашение ещё раз.</p>
 <p style="margin:0"><b>Android:</b> откройте сайт в Chrome → меню ⋮ → «Установить приложение» или «Добавить на главный экран».</p></section>
-<section data-tab="set"><h2 data-k="log">История изменений</h2><div id="logBox"></div></section>
 <p class="s" data-tab="set" style="font-size:13px">Цены по умолчанию ориентировочные, для Ташкента; поправьте их в разделе «Цены продуктов». Данные хранятся на вашем телефоне и, если подключено общее меню, в вашем собственном проекте Supabase.</p>
 </main>
 <nav id="tabs" aria-label="Разделы"><button data-go="menu">Меню</button><button data-go="shop">Покупки<small id="tbShop"></small></button><button data-go="dishes">Блюда</button><button data-go="set">Настройки</button></nav>
-<script src="data.js?v=16"></script>
+<script src="data.js?v=17"></script>
 <script>
 {
 const {ING,SIDES,BASE}=window.DATA,SRC=window.DATA.SRC||{};
@@ -374,7 +373,7 @@ return`<section class="today" data-tab="menu"><h2>Сегодня, ${D[t].toLower
 // ---------- что нового ----------
 const APPV=16;
 const LOG=[
-[16,'26 ноября',['Появилось это окно: после каждого обновления здесь будет коротко написано, что изменилось.','В «Настройках» внизу — история всех изменений.']],
+[16,'26 ноября',['Появилось это окно: после каждого обновления здесь будет коротко написано, что изменилось.']],
 [15,'26 ноября',['Исправлено: после обновления каталог мог показывать пустые группы «Выпечка» и «Салаты».']],
 [14,'26 ноября',['Четыре вкладки внизу экрана: Меню, Покупки, Блюда, Настройки. Меню теперь сразу на первом экране.','В «Настройках» на виду только главное: кто ест, что готовим, бюджет. Остальное — в «Дополнительных настройках».','На вкладке «Покупки» видно, сколько продуктов осталось купить.']],
 [13,'26 ноября',['Каталог блюд разбит по видам: завтраки, супы, вторые, выпечка, салаты.','Добавлены 7 салатов — их удобно брать как дополнительное блюдо.']],
@@ -384,11 +383,10 @@ const LOG=[
 [7,'25 ноября',['У каждого блюда видно, что докупить.','Режим «Сначала готовим из того, что есть дома».']],
 [6,'25 ноября',['«Мои блюда»: свои рецепты, в том числе из Pinterest и через ИИ.']],
 [5,'25 ноября',['«Что есть дома» перед составлением меню, постоянные блюда по дням и любимые блюда.']]];
-function logHtml(){const el=$('#logBox');if(el)el.innerHTML=LOG.map(([v,d,it])=>`<h3>Версия ${v} · ${d}</h3><ul style="margin:4px 0 8px;padding-left:20px">${it.map(x=>`<li>${x}</li>`).join('')}</ul>`).join('')}
 function whatsNew(){const seen=LS.get('cp-seen',0),isNew=!seen&&!localStorage.getItem('cp-form')&&!localStorage.getItem('cp-plan');
 if(isNew||seen>=APPV){LS.set('cp-seen',APPV);return}const items=LOG.filter(([v])=>v>seen).slice(0,3);if(!items.length){LS.set('cp-seen',APPV);return}
 const d=document.createElement('div');d.id='wn';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-labelledby','wnT');
-d.innerHTML='<div class="box"><h2 id="wnT">Что нового</h2><p class="s" style="margin:0">Приложение обновилось'+(items.length>1?' — изменения за последние версии':'')+'.</p><ul>'+items.flatMap(([,,it])=>it).slice(0,7).map(x=>`<li>${x}</li>`).join('')+'</ul><button class="go" id="wnOk" style="margin:0">Понятно</button><p class="s" style="margin:10px 0 0;font-size:13px;text-align:center">Все изменения — в «Настройках» → «История изменений».</p></div>';
+d.innerHTML='<div class="box"><h2 id="wnT">Что нового</h2><p class="s" style="margin:0">Приложение обновилось'+(items.length>1?' — изменения за последние версии':'')+'.</p><ul>'+items.flatMap(([,,it])=>it).slice(0,7).map(x=>`<li>${x}</li>`).join('')+'</ul><button class="go" id="wnOk" style="margin:0">Понятно</button></div>';
 document.body.appendChild(d);const ok=$('#wnOk');ok.focus();const close=()=>{LS.set('cp-seen',APPV);d.remove()};ok.onclick=close;d.addEventListener('click',e=>{if(e.target===d)close()});document.addEventListener('keydown',function k(e){if(e.key=='Escape'){close();document.removeEventListener('keydown',k)}})}
 // ---------- название семьи ----------
 function fnHtml(){const el=$('#fnBox');if(!el)return;
@@ -617,7 +615,7 @@ const f0=LS.get('cp-form',null);if(f0)formSet(f0);
 read();bansHtml();rulesHtml();homeHtml();myHtml();
 try{const q=new URLSearchParams(location.search);if(q.has('share')){const txt=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' '),u=(txt.match(/https:\/\/\S+/)||[''])[0];ED=newED();ED.ig=[{k:'',a:''}];ED.url=u;ED.n=clean((q.get('title')||'').replace(/https:\/\/\S+/g,''),60);ED.msg='Рецепт из «Поделиться»: дайте название и сохраните. Продукты можно указать сейчас или позже.';CL.delete('my');myHtml();history.replaceState(null,'',location.pathname);setTimeout(()=>{const x=$('#myBox');if(x)x.scrollIntoView()},300)}}catch(_){}
 if(load())render();else render();
-startPoll();moveHtml();fnHtml();logHtml();whatsNew();
+startPoll();moveHtml();fnHtml();whatsNew();
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){op='';setTab(b.dataset.go);if(b.dataset.go=='menu'&&G.length)render()}});
 setTab(JOIN?'set':ED?'dishes':G.length?LS.get('cp-tab','menu'):'set');if(JOIN){const f=$('#famSec');if(f)f.scrollIntoView()}
 $('#fnBox').addEventListener('click',e=>{const b=e.target.closest('[data-fn]');if(!b)return;const a=b.dataset.fn;
