@@ -24,7 +24,7 @@ p.s{color:var(--mu);margin:0 0 18px}
 section{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin:0 0 12px}
 section.today{background:var(--hi);border-color:var(--ac2)}
 label.f{display:block;font-size:14px;color:var(--mu);margin:8px 0 4px}
-input[type=number],input[type=text],select{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+input[type=number],input[type=text],input[type=search],select{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
 .row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1;min-width:140px}
 .chip{display:inline-block;margin:0 6px 6px 0}
 .chip input{position:absolute;opacity:0}
@@ -148,7 +148,7 @@ end $$;</pre><button class="sw" id="fCopySql">Скопировать код</but
 <p class="s" data-tab="set" style="font-size:13px">Цены по умолчанию ориентировочные, для Ташкента; поправьте их в разделе «Цены продуктов». Данные хранятся на вашем телефоне и, если подключено общее меню, в вашем собственном проекте Supabase.</p>
 </main>
 <nav id="tabs" aria-label="Разделы"><button data-go="menu">Меню</button><button data-go="shop">Покупки<small id="tbShop"></small></button><button data-go="dishes">Блюда</button><button data-go="set">Настройки</button></nav>
-<script src="data.js?v=17"></script>
+<script src="data.js?v=18"></script>
 <script>
 {
 const {ING,SIDES,BASE}=window.DATA,SRC=window.DATA.SRC||{};
@@ -448,11 +448,14 @@ const EQN=k=>{const b=EQB.find(x=>x[0]==k);if(b)return b[1];const x=EQX.find(e=>
 function whyNot(r){if(BAN.includes(r.n))return'скрыто, в меню не попадает';const w=[];if(!S.cu.includes(r.cu))w.push('кухня не отмечена');if(!dietOK(r))w.push('не подходит по типу питания');
 const ne=r.eqs.filter(c=>!S.eq.includes(c));if(ne.length)w.push('нужна техника: '+ne.map(EQN).join(', ').toLowerCase());const dl=r.ig.filter(([k])=>S.dis.includes(k)&&!ING[k][6]).map(([k])=>ING[k][0].toLowerCase());if(dl.length)w.push('есть «не люблю»: '+dl.join(', '));
 if(r.t>Math.max(S.tW,S.tE))w.push('дольше лимита времени');else if(r.t>S.tW)w.push('только в выходные (дольше лимита на будни)');return w.join('; ')}
-function allList(){const el=$('#allList');if(!el)return;read();HV=haveSet();const q=normN(AF.q);
-const l=R.filter(r=>(!q||normN(r.n).includes(q))&&(!AF.m||kindOf(r)==AF.m)&&(!AF.cu||r.cu==AF.cu)&&(!AF.pr||(AF.pr=='v'?r.ty=='v':r.pr==AF.pr))).sort((a,b)=>kIdx(a)-kIdx(b)||a.n.localeCompare(b.n,'ru'));let lastK='';
-el.innerHTML=`<p class="s" style="margin:6px 0">Показано ${l.length} из ${R.length}.</p>`+l.map(r=>{const kk=kindOf(r),hd=kk!=lastK?`<h3 style="margin:14px 0 2px;color:var(--ac)">${KINDS.find(x=>x[0]==kk)[1]}</h3>`:'';lastK=kk;const t={r,sd:null},c=r.my&&!r.ig.length?(r.pc?'≈ '+fm(r.pc*S.F):'цена не учтена'):fm(costG(t)),why=whyNot(r);
-return hd+`<div class="it" style="display:block;border-top:1px solid var(--bd);padding:8px 0"><b>${FAV.includes(r.n)?'<span class="pin">★</span> ':''}${r.n}</b>${r.my?' <span class="tag">моё</span>':''}<small>${r.m=='S'?'только как доп. блюдо · ':''}${CN[r.cu]||''} · ${r.t} мин · ${c} на ${S.n} чел.${r.keep?' · хорошо хранится':''}${r.soup=='h'?' · сытный суп':r.soup=='l'?' · лёгкий суп':''}${r.eqs.length?' · '+r.eqs.map(EQN).join(', ').toLowerCase():''}</small>${why?`<small class="bad">${why}</small>`:''}${rc(t)}
-<div class="acts2" style="margin-top:4px"><button class="sw" data-mact="afav" data-r="${r.id}">${FAV.includes(r.n)?'★ В любимых':'☆ В любимые'}</button><button class="sw" data-mact="aban" data-r="${r.id}">${BAN.includes(r.n)?'Вернуть в меню':'Скрыть'}</button>${r.my?`<button class="sw" data-mact="aedit" data-r="${r.id}">Изменить</button>`:`<button class="sw" data-mact="acopy" data-r="${r.id}">Сделать свой вариант</button>`}</div></div>`}).join('')}
+let AEXP=new Set();
+function allList(){const el=$('#allList');if(!el)return;read();HV=haveSet();const q=normN(AF.q),filt=!!(q||AF.m||AF.cu||AF.pr);
+const l=R.filter(r=>(!q||normN(r.n).includes(q))&&(!AF.m||kindOf(r)==AF.m)&&(!AF.cu||r.cu==AF.cu)&&(!AF.pr||(AF.pr=='v'?r.ty=='v':r.pr==AF.pr))).sort((a,b)=>a.n.localeCompare(b.n,'ru'));
+const one=r=>{const t={r,sd:null},c=r.my&&!r.ig.length?(r.pc?'≈ '+fm(r.pc*S.F):'цена не учтена'):fm(costG(t)),why=whyNot(r);
+return`<div class="it" style="display:block;border-top:1px solid var(--bd);padding:8px 0"><b>${FAV.includes(r.n)?'<span class="pin">★</span> ':''}${r.n}</b>${r.my?' <span class="tag">моё</span>':''}<small>${r.m=='S'?'только как доп. блюдо · ':''}${CN[r.cu]||''} · ${r.t} мин · ${c} на ${S.n} чел.${r.keep?' · хорошо хранится':''}${r.soup=='h'?' · сытный суп':r.soup=='l'?' · лёгкий суп':''}${r.eqs.length?' · '+r.eqs.map(EQN).join(', ').toLowerCase():''}</small>${why?`<small class="bad">${why}</small>`:''}${rc(t)}
+<div class="acts2" style="margin-top:4px"><button class="sw" data-mact="afav" data-r="${r.id}">${FAV.includes(r.n)?'★ В любимых':'☆ В любимые'}</button><button class="sw" data-mact="aban" data-r="${r.id}">${BAN.includes(r.n)?'Вернуть в меню':'Скрыть'}</button>${r.my?`<button class="sw" data-mact="aedit" data-r="${r.id}">Изменить</button>`:`<button class="sw" data-mact="acopy" data-r="${r.id}">Сделать свой вариант</button>`}</div></div>`};
+el.innerHTML=`<p class="s" style="margin:6px 0">${filt?'Найдено '+l.length+' из '+R.length+'.':'Всего блюд: '+R.length+'. Нажмите на вид, чтобы раскрыть.'}</p>`+KINDS.map(([k,nm])=>{const g=l.filter(r=>kindOf(r)==k);if(!g.length)return'';const open=filt||AEXP.has(k);
+return`<button class="sw" data-mact="agrp" data-k="${k}" aria-expanded="${open}" style="display:flex;width:100%;justify-content:space-between;align-items:center;margin:8px 0 0;padding:12px 14px;font-weight:600;text-align:left"><span>${nm} <span style="font-weight:400;color:var(--mu)">· ${g.length}</span></span><span aria-hidden="true">${open?'▾':'▸'}</span></button>`+(open?`<div style="padding:0 2px">${g.map(one).join('')}</div>`:'')}).join('')}
 function allHtml(){const o=(v,l,s)=>`<option value="${v}"${v==s?' selected':''}>${l}</option>`;
 return`<div class="ed" id="allF"><div class="acts2" style="justify-content:space-between;align-items:center"><b>Все блюда в базе</b><button class="sw" data-mact="all">Скрыть список</button></div>
 <input id="aQ" type="search" placeholder="Поиск по названию" value="${esc(AF.q)}" aria-label="Поиск блюда" style="margin-top:8px">
@@ -552,6 +555,7 @@ document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.targe
 // ---------- события ----------
 $('#form').addEventListener('click',async e=>{const mb=e.target.closest('[data-mact]');if(mb){const a=mb.dataset.mact,i=+mb.dataset.i;
 if(a=='all'){ALLV=!ALLV;return myHtml()}
+if(a=='agrp'){const k=mb.dataset.k;AEXP.has(k)?AEXP.delete(k):AEXP.add(k);return allList()}
 if(a=='afav'||a=='aban'||a=='acopy'||a=='aedit'){const r=R[+mb.dataset.r];if(!r)return;
 if(a=='afav'){FAV=FAV.includes(r.n)?FAV.filter(n=>n!=r.n):FAV.concat(r.n);PS('cp-fav',FAV);rulesHtml();if(G.length)render();return allList()}
 if(a=='aban'){BAN=BAN.includes(r.n)?BAN.filter(n=>n!=r.n):BAN.concat(r.n);PS('cp-ban',BAN);bansHtml();return allList()}
