@@ -73,6 +73,10 @@ body[data-tab=menu] [data-tab]:not([data-tab~=menu]),body[data-tab=shop] [data-t
 #tabs button{border:0;background:none;color:var(--mu);font:600 14px/1.2 system-ui,-apple-system,sans-serif;padding:10px 4px;min-height:52px;border-radius:10px}
 #tabs button[aria-current=page]{color:var(--ac);background:var(--bg)}#tabs button small{display:block;font-weight:400;font-size:12px}
 details#adv>summary{font-weight:600;padding:12px 14px;background:var(--cd);border:1px solid var(--bd);border-radius:10px;margin:0 0 12px;color:var(--tx)}details#adv>summary small{display:block;font-weight:400;color:var(--mu)}
+#wn{position:fixed;inset:0;z-index:50;background:rgba(10,20,25,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+#wn .box{background:var(--cd);color:var(--tx);border-radius:16px;max-width:520px;width:100%;max-height:80vh;overflow:auto;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#wn h2{font:700 22px/1.2 Georgia,serif;margin:0 0 4px}#wn ul{padding-left:20px;margin:10px 0 14px}#wn li{margin:0 0 8px}
+@media(min-width:600px){#wn{align-items:center}}
 .lf{font-weight:500;color:var(--ac)}.pin{font-weight:600;color:var(--ac2)}
 .ban{display:flex;gap:8px;align-items:center;padding:4px 0}.ban span{flex:1}
 </style></head><body><main>
@@ -141,10 +145,11 @@ end $$;</pre><button class="sw" id="fCopySql">Скопировать код</but
 <button class="go" id="instBtn" hidden style="margin:0 0 10px">Установить приложение</button>
 <p style="margin:0 0 6px"><b>iPhone:</b> откройте сайт в Safari → кнопка «Поделиться» (квадрат со стрелкой; в компактном виде — «•••» рядом с адресом) → «На экран «Домой»» → «Добавить». Если вы подключались к общему меню в Safari, откройте приложение со значка и вставьте ссылку-приглашение ещё раз.</p>
 <p style="margin:0"><b>Android:</b> откройте сайт в Chrome → меню ⋮ → «Установить приложение» или «Добавить на главный экран».</p></section>
+<section data-tab="set"><h2 data-k="log">История изменений</h2><div id="logBox"></div></section>
 <p class="s" data-tab="set" style="font-size:13px">Цены по умолчанию ориентировочные, для Ташкента; поправьте их в разделе «Цены продуктов». Данные хранятся на вашем телефоне и, если подключено общее меню, в вашем собственном проекте Supabase.</p>
 </main>
 <nav id="tabs" aria-label="Разделы"><button data-go="menu">Меню</button><button data-go="shop">Покупки<small id="tbShop"></small></button><button data-go="dishes">Блюда</button><button data-go="set">Настройки</button></nav>
-<script src="data.js"></script>
+<script src="data.js?v=16"></script>
 <script>
 {
 const {ING,SIDES,BASE}=window.DATA,SRC=window.DATA.SRC||{};
@@ -366,6 +371,25 @@ const row=(d,m,l)=>{const g=slotG(d,m);if(!g)return'';const k=d+'-'+m,opn=op==k|
 function todayHtml(){const t=(new Date().getDay()+6)%7,rows=ML.map(([m,l])=>row(t,m,l)).join('');if(!rows)return'';
 const cook=G.filter(g=>g.s[0][0]==t),tom=G.filter(g=>g.s.length>1&&g.s[0][0]==t);
 return`<section class="today" data-tab="menu"><h2>Сегодня, ${D[t].toLowerCase()}</h2>${cook.length?`<p class="s" style="margin:0 0 6px">Готовим сегодня: ${cook.map(g=>g.r.n).join(', ')}.${tom.length?' Часть оставьте на следующий приём.':''}</p>`:'<p class="s" style="margin:0 0 6px">Сегодня ничего не готовим, едим остатки.</p>'}${rows}</section>`}
+// ---------- что нового ----------
+const APPV=16;
+const LOG=[
+[16,'26 ноября',['Появилось это окно: после каждого обновления здесь будет коротко написано, что изменилось.','В «Настройках» внизу — история всех изменений.']],
+[15,'26 ноября',['Исправлено: после обновления каталог мог показывать пустые группы «Выпечка» и «Салаты».']],
+[14,'26 ноября',['Четыре вкладки внизу экрана: Меню, Покупки, Блюда, Настройки. Меню теперь сразу на первом экране.','В «Настройках» на виду только главное: кто ест, что готовим, бюджет. Остальное — в «Дополнительных настройках».','На вкладке «Покупки» видно, сколько продуктов осталось купить.']],
+[13,'26 ноября',['Каталог блюд разбит по видам: завтраки, супы, вторые, выпечка, салаты.','Добавлены 7 салатов — их удобно брать как дополнительное блюдо.']],
+[12,'26 ноября',['Каталог всех блюд с поиском и фильтрами на вкладке «Блюда». Видно, почему блюдо не попадает в меню.','«Сделать свой вариант» — копия встроенного блюда, которую можно изменить под себя.']],
+[11,'26 ноября',['«Изменить» → «Доготовить», если остатков мало, или «+ Дополнительное блюдо» к любому приёму.','Замена остатков больше не меняет вчерашнее блюдо.']],
+[10,'25 ноября',['Название семьи в шапке — нажмите «+ Название семьи».']],
+[7,'25 ноября',['У каждого блюда видно, что докупить.','Режим «Сначала готовим из того, что есть дома».']],
+[6,'25 ноября',['«Мои блюда»: свои рецепты, в том числе из Pinterest и через ИИ.']],
+[5,'25 ноября',['«Что есть дома» перед составлением меню, постоянные блюда по дням и любимые блюда.']]];
+function logHtml(){const el=$('#logBox');if(el)el.innerHTML=LOG.map(([v,d,it])=>`<h3>Версия ${v} · ${d}</h3><ul style="margin:4px 0 8px;padding-left:20px">${it.map(x=>`<li>${x}</li>`).join('')}</ul>`).join('')}
+function whatsNew(){const seen=LS.get('cp-seen',0),isNew=!seen&&!localStorage.getItem('cp-form')&&!localStorage.getItem('cp-plan');
+if(isNew||seen>=APPV){LS.set('cp-seen',APPV);return}const items=LOG.filter(([v])=>v>seen).slice(0,3);if(!items.length){LS.set('cp-seen',APPV);return}
+const d=document.createElement('div');d.id='wn';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-labelledby','wnT');
+d.innerHTML='<div class="box"><h2 id="wnT">Что нового</h2><p class="s" style="margin:0">Приложение обновилось'+(items.length>1?' — изменения за последние версии':'')+'.</p><ul>'+items.flatMap(([,,it])=>it).slice(0,7).map(x=>`<li>${x}</li>`).join('')+'</ul><button class="go" id="wnOk" style="margin:0">Понятно</button><p class="s" style="margin:10px 0 0;font-size:13px;text-align:center">Все изменения — в «Настройках» → «История изменений».</p></div>';
+document.body.appendChild(d);const ok=$('#wnOk');ok.focus();const close=()=>{LS.set('cp-seen',APPV);d.remove()};ok.onclick=close;d.addEventListener('click',e=>{if(e.target===d)close()});document.addEventListener('keydown',function k(e){if(e.key=='Escape'){close();document.removeEventListener('keydown',k)}})}
 // ---------- название семьи ----------
 function fnHtml(){const el=$('#fnBox');if(!el)return;
 if(FEDIT){el.innerHTML='<div class="ed2"><input id="fnIn" type="text" maxlength="40" placeholder="Например: Семья Шамсиевых" value="'+esc(FNAME)+'" aria-label="Название семьи"><button class="sw" data-fn="save">Сохранить</button><button class="sw" data-fn="cancel">Отмена</button></div>';const i=$('#fnIn');if(i)i.focus();return}
@@ -593,7 +617,7 @@ const f0=LS.get('cp-form',null);if(f0)formSet(f0);
 read();bansHtml();rulesHtml();homeHtml();myHtml();
 try{const q=new URLSearchParams(location.search);if(q.has('share')){const txt=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' '),u=(txt.match(/https:\/\/\S+/)||[''])[0];ED=newED();ED.ig=[{k:'',a:''}];ED.url=u;ED.n=clean((q.get('title')||'').replace(/https:\/\/\S+/g,''),60);ED.msg='Рецепт из «Поделиться»: дайте название и сохраните. Продукты можно указать сейчас или позже.';CL.delete('my');myHtml();history.replaceState(null,'',location.pathname);setTimeout(()=>{const x=$('#myBox');if(x)x.scrollIntoView()},300)}}catch(_){}
 if(load())render();else render();
-startPoll();moveHtml();fnHtml();
+startPoll();moveHtml();fnHtml();logHtml();whatsNew();
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){op='';setTab(b.dataset.go);if(b.dataset.go=='menu'&&G.length)render()}});
 setTab(JOIN?'set':ED?'dishes':G.length?LS.get('cp-tab','menu'):'set');if(JOIN){const f=$('#famSec');if(f)f.scrollIntoView()}
 $('#fnBox').addEventListener('click',e=>{const b=e.target.closest('[data-fn]');if(!b)return;const a=b.dataset.fn;
