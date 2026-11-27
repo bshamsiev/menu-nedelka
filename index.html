@@ -148,15 +148,15 @@ end $$;</pre><button class="sw" id="fCopySql">Скопировать код</but
 <p class="s" data-tab="set" style="font-size:13px">Цены по умолчанию ориентировочные, для Ташкента; поправьте их в разделе «Цены продуктов». Данные хранятся на вашем телефоне и, если подключено общее меню, в вашем собственном проекте Supabase.</p>
 </main>
 <nav id="tabs" aria-label="Разделы"><button data-go="menu">Меню</button><button data-go="shop">Покупки<small id="tbShop"></small></button><button data-go="dishes">Блюда</button><button data-go="set">Настройки</button></nav>
-<script src="data.js?v=18"></script>
+<script src="data.js?v=23"></script>
 <script>
 {
-const {ING,SIDES,BASE}=window.DATA,SRC=window.DATA.SRC||{};
+const {ING,SIDES,BASE}=window.DATA,SRC=window.DATA.SRC||{},SRC2=window.DATA.SRC2||{};
 const CAT=['Мясо и рыба','Крупы и макароны','Овощи и фрукты','Молочное и яйца','Прочее'];
 const R=window.DATA.R.split('\n').map((l,id)=>{const f=l.split('|');return{id,n:f[0],m:f[1],ty:f[2],t:+f[3],eq:f[4],eqs:[...f[4]],cu:f[5],pr:f[6],keep:f[7].includes('k'),soup:f[7].includes('h')?'h':f[7].includes('l')?'l':'',bake:f[7].includes('p'),ig:f[8].split(' ').map(x=>{const[k,v]=x.split(':');return[k,+v]}),st:f.slice(9)}});
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const D=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'],DV=['в понедельник','во вторник','в среду','в четверг','в пятницу','в субботу','в воскресенье'];
-const ML=[['b','Завтрак'],['l','Обед'],['d','Ужин']],CN={u:'Узбекская',t:'Турецкая',e:'Европейская',a:'Азиатская'},PN={b:'говядина',c:'курица',f:'рыба',v:'без мяса'};
+const ML=[['b','Завтрак'],['l','Обед'],['d','Ужин']],CN={u:'Узбекская',t:'Турецкая',e:'Европейская',a:'Азиатская'},PN={b:'говядина и баранина',c:'курица',f:'рыба',v:'без мяса'};
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let PR=LS.get('cp-pr',{}),A=LS.get('cp-adj',[0,0,0,0,0]),BAN=LS.get('cp-ban',[]),HOME=LS.get('cp-home',[]);
 let S={},G=[],op='',sdi=0;
@@ -175,7 +175,7 @@ MY.forEach(d=>{const ig=d.ig.filter(([k])=>ING[k]).map(([k,a])=>[k,a/d.srv]);R.p
 G.forEach(g=>{const r=R.find(x=>x.n==g.r.n);if(r)g.r=r})}
 rebuildR();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const RT={'p:f':'что-нибудь из рыбы','p:c':'что-нибудь с курицей','p:b':'что-нибудь с говядиной','p:v':'блюдо без мяса','soup':'суп'};
+const RT={'p:f':'что-нибудь из рыбы','p:c':'что-нибудь с курицей','p:b':'что-нибудь с говядиной или бараниной','p:v':'блюдо без мяса','soup':'суп'};
 const MLN={b:'завтрак',l:'обед',d:'ужин'};
 // ---------- общее меню семьи (Supabase) ----------
 const TAB=Math.random().toString(36).slice(2);
@@ -360,7 +360,7 @@ const xrows=(g,d,m)=>xG(d,m).map(x=>`<div style="margin-top:6px;padding-top:6px;
 const info=(g,d,m)=>{if(g.s.length<2)return'';const[d0,m0]=g.s[0];if(d0==d&&m0==m){const n=g.s.length-1;return`<br><b class="lf">Готовим с запасом: хватит ещё на ${n} ${n==1?'приём':'приёма'}</b>`}return`<br><b class="lf">Остатки: готовили ${DV[d0]} ${m0=='l'?'днём':'вечером'}</b>`};
 const soupN=g=>g.sd!=null?`<br><b class="lf">Лёгкий суп: добавьте второе (${SIDES[g.sd][0]})</b>`:g.r.soup=='h'?'<br><b class="lf">Сытный суп, второе не нужно</b>':'';
 const amt=(k,a)=>{const v=a*S.F,u=ING[k][1];return ING[k][0].toLowerCase()+' '+(u=='шт'?(Math.round(v*10)/10).toLocaleString('ru-RU')+' шт':u=='пуч'?(Math.round(v*10)/10).toLocaleString('ru-RU')+' пуч.':Math.round(v/5)*5+(u=='g'?' г':' мл'))};
-const srcL=r=>{if(r.my)return r.url?`<p class="src"><a href="${esc(r.url)}" target="_blank" rel="noopener">Открыть рецепт (${esc(r.url.replace(/^https:\/\/(www\.)?/,'').split(/[/?#]/)[0])})</a></p>`:'';const s=SRC[r.n];if(s)return`<p class="src">Пошаговые фото: <a href="${s[0]}" target="_blank" rel="noopener">eda.ru, ${s[1]=='рецепт'?'рецепт':'подборка рецептов'}</a></p>`;const q=encodeURIComponent(r.n+' рецепт пошагово с фото');return`<p class="src">Проверенного источника нет: <a href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener">найти пошаговые фото</a></p>`};
+const srcL=r=>{if(r.my)return r.url?`<p class="src"><a href="${esc(r.url)}" target="_blank" rel="noopener">Открыть рецепт (${esc(r.url.replace(/^https:\/\/(www\.)?/,'').split(/[/?#]/)[0])})</a></p>`:'';const s=SRC[r.n];if(s){const host=s[0].replace(/^https:\/\/(www\.)?/,'').split('/')[0];return`<p class="src">Пошаговые фото: <a href="${s[0]}" target="_blank" rel="noopener">${host}, ${s[1]=='рецепт'?'рецепт':s[1]=='статья'?'статья с рецептом':'подборка рецептов'}${s[2]=='en'?', на английском':''}</a>${SRC2[r.n]?`<br>Оригинальный турецкий рецепт: <a href="${SRC2[r.n][0]}" target="_blank" rel="noopener">turkishdishes.net, на английском</a>`:''}<br>Количество продуктов там на другое число порций — берите граммовку отсюда, она уже на вашу семью.</p>`}const q=encodeURIComponent('site:zira.uz '+r.n.replace(/\s*\(.*?\)/g,'').replace(/ в (мультиварке|микроволновке|духовке)/,''));return`<p class="src">Точного рецепта с фото не подобрано: <a href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener">поискать на zira.uz</a></p>`};
 const rc=g=>`<details class="rc"><summary>Рецепт</summary><p class="s" style="margin:4px 0">${ingOf(g).length?`На ${S.n} чел.: ${ingOf(g).map(([k,a])=>amt(k,a)).join(', ')}`:'Продукты не указаны.'}</p><ol>${g.r.st.concat(g.sd!=null?[SIDES[g.sd][2]]:[]).map(x=>`<li>${x}</li>`).join('')}</ol>${srcL(g.r)}</details>`;
 function picker(g,d,m){const us=G.map(x=>x.r.id),opts=gp(g).filter(r=>r.id!=g.r.id).map(r=>{const t={r,sd:null};if(r.soup=='l')t.sd=g.sd!=null?g.sd:0;return[r,costG(t),r.my&&!r.ig.length?99:missOf(ingOf(t),HV).length]}).sort((a,b)=>a[2]-b[2]||a[1]-b[1]);
 const lf=isLeft(g,d,m);return`<div class="pick" data-d="${d}" data-m="${m}">${lf?`<p class="s" style="margin:0 0 6px;font-size:13px">Это остатки. Замена касается только этого приёма — ${DV[g.s[0][0]]} ${g.s[0][1]=='l'?'днём':'вечером'} блюдо останется прежним.</p>`:''}<div class="acts"><button class="go" data-act="xopen" style="margin:0;width:auto;padding:8px 14px;font-size:15px">${lf?'Доготовить':'+ Дополнительное блюдо'}</button><button class="sw" data-act="lock">${g.lock?'Открепить':'Закрепить'}</button><button class="sw" data-act="fav">${FAV.includes(g.r.n)?'★ Убрать из любимых':'☆ В любимые'}</button><button class="sw" data-act="rnd">Случайное</button><button class="sw" data-act="ban">Больше не предлагать</button><button class="sw" data-act="close">Закрыть</button></div>`+
@@ -371,8 +371,9 @@ function todayHtml(){const t=(new Date().getDay()+6)%7,rows=ML.map(([m,l])=>row(
 const cook=G.filter(g=>g.s[0][0]==t),tom=G.filter(g=>g.s.length>1&&g.s[0][0]==t);
 return`<section class="today" data-tab="menu"><h2>Сегодня, ${D[t].toLowerCase()}</h2>${cook.length?`<p class="s" style="margin:0 0 6px">Готовим сегодня: ${cook.map(g=>g.r.n).join(', ')}.${tom.length?' Часть оставьте на следующий приём.':''}</p>`:'<p class="s" style="margin:0 0 6px">Сегодня ничего не готовим, едим остатки.</p>'}${rows}</section>`}
 // ---------- что нового ----------
-const APPV=16;
+const APPV=19;
 const LOG=[
+[19,'27 ноября',['12 новых блюд: чайханский плов, машхурда, машкичири, шавля, нон-палов, самаркандский плов, кесма-лагман, угра-ош, манты с тыквой, катлама, кабачковая икра, салат фунчоза.','У многих рецептов — ссылка на пошаговые фото на zira.uz.']],
 [16,'26 ноября',['Появилось это окно: после каждого обновления здесь будет коротко написано, что изменилось.']],
 [15,'26 ноября',['Исправлено: после обновления каталог мог показывать пустые группы «Выпечка» и «Салаты».']],
 [14,'26 ноября',['Четыре вкладки внизу экрана: Меню, Покупки, Блюда, Настройки. Меню теперь сразу на первом экране.','В «Настройках» на виду только главное: кто ест, что готовим, бюджет. Остальное — в «Дополнительных настройках».','На вкладке «Покупки» видно, сколько продуктов осталось купить.']],
@@ -430,7 +431,7 @@ const ingOpts=sel=>'<option value="">— выберите —</option>'+Object.e
 function edHtml(){const e=ED,o=(v,l,s)=>`<option value="${v}"${v==s?' selected':''}>${l}</option>`;
 return`<div class="ed"><h3 style="margin:0 0 6px">${e.id?'Изменить блюдо':'Новое блюдо'}</h3>
 <label class="f" for="eN">Название *</label><input id="eN" type="text" maxlength="60" value="${esc(e.n)}">
-<div class="row"><div><label class="f" for="eM">Приём пищи *</label><select id="eM">${o('M','Обед и ужин',e.m)+o('B','Завтрак',e.m)+o('S','Салат или закуска (как доп. блюдо)',e.m)}</select></div><div><label class="f" for="eP">Тип *</label><select id="eP">${o('b','Говядина',e.pr)+o('c','Курица',e.pr)+o('f','Рыба',e.pr)+o('v','Без мяса',e.pr)}</select></div></div>
+<div class="row"><div><label class="f" for="eM">Приём пищи *</label><select id="eM">${o('M','Обед и ужин',e.m)+o('B','Завтрак',e.m)+o('S','Салат или закуска (как доп. блюдо)',e.m)}</select></div><div><label class="f" for="eP">Тип *</label><select id="eP">${o('b','Говядина или баранина',e.pr)+o('c','Курица',e.pr)+o('f','Рыба',e.pr)+o('v','Без мяса',e.pr)}</select></div></div>
 <label class="f" for="eC">Кухня *</label><select id="eC">${Object.entries(CN).map(([k,v])=>o(k,esc(v),e.cu)).join('')+o('+','+ новая кухня…',e.cu)}</select>${e.cu=='+'?`<input id="eCn" type="text" maxlength="20" placeholder="Например: грузинская" value="${esc(e.cun)}" style="margin-top:6px">`:''}
 <div class="row"><div><label class="f" for="eT">Время, мин *</label><input id="eT" type="number" min="5" max="600" value="${esc(e.t)}"></div><div><label class="f" for="eS">Рецепт на сколько порций *</label><input id="eS" type="number" min="1" max="20" value="${esc(e.srv)}"></div></div>
 <label class="f">Техника (плита есть всегда)</label><div>${EQB.concat(EQX.map(x=>[x.k,x.n])).map(([k,n])=>`<label class="chip"><input type="checkbox" class="eqc" value="${k}"${e.eq.includes(k)?' checked':''}><span>${esc(n)}</span></label>`).join('')}</div><input id="eEn" type="text" maxlength="30" placeholder="Другая техника, например: мангал" value="${esc(e.eqn)}">
@@ -459,7 +460,7 @@ return`<button class="sw" data-mact="agrp" data-k="${k}" aria-expanded="${open}"
 function allHtml(){const o=(v,l,s)=>`<option value="${v}"${v==s?' selected':''}>${l}</option>`;
 return`<div class="ed" id="allF"><div class="acts2" style="justify-content:space-between;align-items:center"><b>Все блюда в базе</b><button class="sw" data-mact="all">Скрыть список</button></div>
 <input id="aQ" type="search" placeholder="Поиск по названию" value="${esc(AF.q)}" aria-label="Поиск блюда" style="margin-top:8px">
-<div class="row"><div><label class="f" for="aM">Вид</label><select id="aM">${o('','Все',AF.m)+KINDS.map(([k,v])=>o(k,v,AF.m)).join('')}</select></div><div><label class="f" for="aC">Кухня</label><select id="aC">${o('','Все',AF.cu)+Object.entries(CN).map(([k,v])=>o(k,esc(v),AF.cu)).join('')}</select></div><div><label class="f" for="aP">Тип</label><select id="aP">${o('','Все',AF.pr)+o('b','Говядина',AF.pr)+o('c','Курица',AF.pr)+o('f','Рыба',AF.pr)+o('v','Без мяса',AF.pr)}</select></div></div>
+<div class="row"><div><label class="f" for="aM">Вид</label><select id="aM">${o('','Все',AF.m)+KINDS.map(([k,v])=>o(k,v,AF.m)).join('')}</select></div><div><label class="f" for="aC">Кухня</label><select id="aC">${o('','Все',AF.cu)+Object.entries(CN).map(([k,v])=>o(k,esc(v),AF.cu)).join('')}</select></div><div><label class="f" for="aP">Тип</label><select id="aP">${o('','Все',AF.pr)+o('b','Говядина, баранина',AF.pr)+o('c','Курица',AF.pr)+o('f','Рыба',AF.pr)+o('v','Без мяса',AF.pr)}</select></div></div>
 <div id="allList"></div></div>`}
 function myHtml(){const el=$('#myBox');if(!el)return;
 const lst=MY.length?MY.map((d,i)=>`<div class="ban"><span><b>${esc(d.n)}</b><br><span class="tag">${d.m=='B'?'завтрак':d.m=='S'?'салат':'обед и ужин'}</span> <span class="tag">${esc(CN[d.cu]||'')}</span> <span class="tag">${d.ig.length?'по продуктам':d.pc!=null?'примерная цена':'цена не учтена'}</span></span><button class="sw" data-mact="edit" data-i="${i}">Изменить</button></div>`).join(''):'<p class="s" style="margin:0 0 8px">Своих блюд пока нет.</p>';
